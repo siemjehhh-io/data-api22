@@ -1,4 +1,5 @@
 // State management
+const API_TOKEN = "pin88_sec_e2c8a7b9d4f6c8e3";
 let masterKey = "";
 let currentBankFilter = "dp";
 let db = {
@@ -16,10 +17,11 @@ let db = {
 };
 
 // Initial Checks
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
     if (typeof CryptoJS === 'undefined') {
         showAlert("PERINGATAN: Library keamanan CryptoJS gagal dimuat secara lokal. Pastikan file 'crypto-js.min.js' ada di folder yang sama dengan 'index.html'.", "Peringatan Sistem");
     }
+    await syncFromServer();
     checkPasswordStatus();
     
     // Auto-format nominal inputs with dots
@@ -192,6 +194,21 @@ function saveDatabaseToStorage() {
             }))
         };
         localStorage.setItem('pin88_secure_db', JSON.stringify(encryptedDb));
+        
+        // Push payload to server API in the background
+        const payload = {
+            hash: localStorage.getItem('pin88_password_hash'),
+            db: encryptedDb
+        };
+        fetch('/api/db', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-PIN88-Token': API_TOKEN
+            },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error("Failed to sync to server database:", err));
+
         return true;
     } catch (e) {
         console.error("Error saving database:", e);
@@ -1535,4 +1552,24 @@ function formatDisplayDate(dStr) {
         return `${day} ${month} ${year}`;
     }
     return dStr;
+}
+
+async function syncFromServer() {
+    try {
+        const response = await fetch('/api/db', {
+            headers: { 'X-PIN88-Token': API_TOKEN }
+        });
+        if (!response.ok) throw new Error('API request failed');
+        const data = await response.json();
+        if (data && !data.empty) {
+            if (data.hash) {
+                localStorage.setItem('pin88_password_hash', data.hash);
+            }
+            if (data.db) {
+                localStorage.setItem('pin88_secure_db', JSON.stringify(data.db));
+            }
+        }
+    } catch (err) {
+        console.error("Failed to sync from server API, using local storage cache:", err);
+    }
 }
