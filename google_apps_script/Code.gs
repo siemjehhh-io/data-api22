@@ -6,7 +6,7 @@
 // ⚠️ WAJIB DIISI: Paste ID Google Spreadsheet Anda di sini
 // Cara dapat ID: Buka Spreadsheet → salin dari URL:
 // https://docs.google.com/spreadsheets/d/[INI_ADALAH_ID]/edit
-var SPREADSHEET_ID = "1975E9up_zCXy3pmtt1auwmk4IhKEoevxyD-RrF1PP5c";
+var SPREADSHEET_ID = "12zPKhMD7M0jRO0wBDrF1ALZj5MGX_O7G8Tc0YSL9mMI";
 
 // Nama-nama sheet tab (jangan diubah)
 var SHEETS = {
