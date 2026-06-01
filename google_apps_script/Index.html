@@ -555,7 +555,46 @@
         </div>
     </div>
 
+    <!-- ✅ ERROR HANDLER — harus SEBELUM App_GAS agar bisa tangkap parse errors -->
+    <script>
+    window.onerror = function(msg, url, line, col, error) {
+        var d = document.getElementById('_pin88diag');
+        if (!d) {
+            d = document.createElement('div');
+            d.id = '_pin88diag';
+            d.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#d32f2f;color:white;padding:16px 24px;border-radius:12px;z-index:999999;font-size:14px;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:sans-serif;';
+            document.body.appendChild(d);
+        }
+        d.innerHTML = '<b>⚠️ JavaScript Error</b><br>' + msg + '<br><small>Line: ' + line + '</small>';
+        // Pastikan overlay tidak blocking
+        var ov = document.getElementById('gasLoadingOverlay');
+        if (ov) ov.style.display = 'none';
+        return true;
+    };
+    </script>
+
     <!-- JS Core Logic -->
     <?!= include('App_GAS'); ?>
+
+    <!-- ✅ VERIFIKASI — cek apakah App_GAS berhasil load -->
+    <script>
+    (function() {
+        // Cek apakah fungsi kritis dari App_GAS terdaftar
+        var missing = [];
+        if (typeof switchTab !== 'function') missing.push('switchTab');
+        if (typeof openModal !== 'function') missing.push('openModal');
+        if (typeof loadAllData !== 'function') missing.push('loadAllData');
+        if (typeof renderApp !== 'function') missing.push('renderApp');
+        
+        if (missing.length > 0) {
+            var d = document.createElement('div');
+            d.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#d32f2f;color:white;padding:16px 24px;border-radius:12px;z-index:999999;font-size:14px;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:sans-serif;';
+            d.innerHTML = '<b>⚠️ App_GAS.html GAGAL LOAD!</b><br>Fungsi tidak ditemukan: ' + missing.join(', ') + '<br><small>Pastikan file App_GAS sudah di-copy dengan benar ke GAS Editor</small>';
+            document.body.appendChild(d);
+        } else {
+            console.log('✅ PIN88 GAS: Semua fungsi berhasil dimuat');
+        }
+    })();
+    </script>
 </body>
 </html>
