@@ -22,6 +22,17 @@ var SHEETS = {
 // WEB APP ENTRY POINTS
 // ============================================================
 
+function debugAppGas() {
+  var content = HtmlService.createHtmlOutputFromFile('App_GAS').getContent();
+  Logger.log('Content length: ' + content.length);
+  Logger.log('Has switchTab: ' + content.indexOf('switchTab'));
+  Logger.log('Has openModal: ' + content.indexOf('openModal'));
+  Logger.log('Has loadAllData: ' + content.indexOf('loadAllData'));
+  Logger.log('Has renderApp: ' + content.indexOf('renderApp'));
+  Logger.log('Starts with: ' + content.substring(0, 100));
+  Logger.log('Ends with: ' + content.substring(content.length - 100));
+}
+
 function doGet(e) {
   return HtmlService.createTemplateFromFile('Index')
       .evaluate()
