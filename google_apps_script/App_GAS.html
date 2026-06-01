@@ -21,7 +21,7 @@ let db = {
 };
 
 // ============================================================
-// INIT: Load data saat halaman pertama dibuka
+// INIT: Langsung masuk dashboard — tidak perlu password di GAS
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
     // Auto-format nominal inputs with dots
@@ -38,19 +38,41 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Langsung masuk dashboard (tidak ada login/password untuk versi GAS)
-    // Inisialisasi sheets terlebih dahulu, lalu load semua data
-    showLoadingOverlay('Menghubungkan ke database...');
+    // ✅ LANGSUNG sembunyikan auth screen — GAS tidak pakai password lokal
+    const authScreen = document.getElementById('authScreen');
+    if (authScreen) authScreen.style.display = 'none';
+
+    // Tampilkan loading & mulai koneksi ke Sheets
+    showLoadingOverlay('Menghubungkan ke Google Sheets...');
     google.script.run
         .withSuccessHandler(function(result) {
             loadAllData();
         })
         .withFailureHandler(function(err) {
             hideLoadingOverlay();
-            showAlert('Gagal inisialisasi database: ' + err.message, 'Error');
+            showAlert('Gagal inisialisasi database: ' + (err.message || err), 'Error Koneksi');
         })
         .initSheets();
 });
+
+// ✅ Dummy handleAuth — dipanggil form lama tapi langsung diabaikan
+// Versi GAS tidak butuh password, data tersimpan di Google Sheets
+function handleAuth(event) {
+    if (event) event.preventDefault();
+    const authScreen = document.getElementById('authScreen');
+    if (authScreen) authScreen.style.display = 'none';
+    showLoadingOverlay('Menghubungkan ke Google Sheets...');
+    google.script.run
+        .withSuccessHandler(function(result) {
+            loadAllData();
+        })
+        .withFailureHandler(function(err) {
+            hideLoadingOverlay();
+            showAlert('Gagal koneksi ke database: ' + (err.message || err), 'Error');
+        })
+        .initSheets();
+}
+
 
 // ============================================================
 // SHOW / HIDE LOADING OVERLAY
