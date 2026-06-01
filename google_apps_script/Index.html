@@ -586,10 +586,16 @@
         if (typeof loadAllData !== 'function') missing.push('loadAllData');
         if (typeof renderApp !== 'function') missing.push('renderApp');
         
+        var appGasLength = parseInt("<?= include('App_GAS').length ?>", 10);
+        var appGasStart = "<?= include('App_GAS').substring(0, 80).replace(/[^a-zA-Z0-9 <>\/=!_#-]/g, ' ') ?>";
+        
         if (missing.length > 0) {
             var d = document.createElement('div');
-            d.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#d32f2f;color:white;padding:16px 24px;border-radius:12px;z-index:999999;font-size:14px;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:sans-serif;';
-            d.innerHTML = '<b>⚠️ App_GAS.html GAGAL LOAD!</b><br>Fungsi tidak ditemukan: ' + missing.join(', ') + '<br><small>Pastikan file App_GAS sudah di-copy dengan benar ke GAS Editor</small>';
+            d.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#d32f2f;color:white;padding:16px 24px;border-radius:12px;z-index:999999;font-size:14px;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);font-family:sans-serif;line-height:1.5;';
+            d.innerHTML = '<b>⚠️ App_GAS.html GAGAL LOAD!</b><br>' +
+                          'Fungsi tidak ditemukan: ' + missing.join(', ') + '<br>' +
+                          '<small>Karakter ter-load: ' + appGasLength + ' | Awal file: "' + appGasStart + '"</small><br>' +
+                          '<small>Pastikan file App_GAS sudah di-copy dengan benar ke GAS Editor</small>';
             document.body.appendChild(d);
         } else {
             console.log('✅ PIN88 GAS: Semua fungsi berhasil dimuat');
