@@ -1,0 +1,1194 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Warm Cream & Clay Color Palette */
+    --bg-primary: #f2ebe1; /* Warm cream/beige background */
+    --bg-secondary: #fbf9f4; /* Sidebar background (warm white) */
+    --bg-card: #ffffff; /* Card background (pure white) */
+    --border-color: #e5dfd3; /* Soft border color */
+    --border-hover: #c89f83;
+    
+    --text-primary: #4a3e3d; /* Dark warm charcoal/brown */
+    --text-secondary: #7a6c68; /* Soft medium brown */
+    --text-muted: #a69993; /* Muted light brown */
+    
+    /* Active menu and primary buttons (Warm terracotta/clay) */
+    --accent-active: #cda283; 
+    --accent-active-hover: #be9272;
+    --accent-active-bg: rgba(205, 162, 131, 0.15);
+    
+    /* Stats & Accents (Pastel colors from target UI) */
+    --pastel-green: #97dcb9;
+    --pastel-green-text: #1b4b3e;
+    
+    --pastel-yellow: #ebb976;
+    --pastel-yellow-text: #59370c;
+    
+    --pastel-purple: #c0a2ea;
+    --pastel-purple-text: #3e2268;
+    
+    --pastel-blue: #8bc4f2;
+    --pastel-blue-text: #113f68;
+
+    --accent-red: #ea7066;
+    
+    --shadow-soft: 0 10px 30px rgba(74, 62, 61, 0.04);
+    --shadow-md: 0 15px 35px rgba(74, 62, 61, 0.06);
+    --shadow-lg: 0 20px 45px rgba(74, 62, 61, 0.1);
+    --shadow-active: 0 8px 25px rgba(205, 162, 131, 0.3);
+    
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Master Password / Auth Page Screen */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-primary);
+    z-index: 9999;
+}
+
+.auth-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 45px 40px;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 460px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.auth-logo {
+    font-family: var(--font-heading);
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.auth-card h2 {
+    font-family: var(--font-heading);
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* App Main Layout */
+.app-container {
+    display: grid;
+    grid-template-columns: 310px 1fr;
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+}
+
+/* Sidebar Styles (Floating Rounded Card Style) */
+aside {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+    margin: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    position: sticky;
+    top: 20px;
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* Hide scrollbar IE and Edge */
+    scrollbar-width: none;  /* Hide scrollbar Firefox */
+}
+
+aside::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome, Safari and Opera */
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--accent-active);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: #ffffff;
+    box-shadow: var(--shadow-active);
+}
+
+.logo-text {
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 18px;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.nav-item:hover {
+    color: var(--text-primary);
+    background: rgba(205, 162, 131, 0.06);
+}
+
+.nav-item.active {
+    color: #ffffff !important;
+    background: var(--accent-active);
+    box-shadow: var(--shadow-active);
+}
+
+.nav-item.active svg {
+    color: #ffffff;
+}
+
+.nav-item svg {
+    width: 20px;
+    height: 20px;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.sidebar-footer {
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.lock-btn {
+    width: 100%;
+    padding: 12px;
+    background: rgba(234, 112, 102, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(234, 112, 102, 0.2);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 700;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.lock-btn:hover {
+    background: var(--accent-red);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 20px rgba(234, 112, 102, 0.2);
+}
+
+/* Main Content Area */
+main {
+    padding: 30px 40px 30px 20px;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.header-title h1 {
+    font-family: var(--font-heading);
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.header-title p {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+}
+
+.btn-primary {
+    background: var(--accent-active);
+    color: #ffffff;
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-active);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    background: var(--accent-active-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(205, 162, 131, 0.45);
+}
+
+.btn-secondary {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 14px 28px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-secondary:hover {
+    border-color: var(--text-secondary);
+    background: var(--bg-secondary);
+}
+
+/* Common form inputs styling */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-active);
+    box-shadow: 0 0 10px rgba(205, 162, 131, 0.15);
+}
+
+/* Dashboard Stat Cards (Pastel colored floating blocks) */
+.stats-container {
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    border-radius: var(--radius-lg);
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
+    height: 180px;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-label {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.stat-value {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 15px 0;
+}
+
+.stat-desc {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.75;
+}
+
+/* Stat card colored styles */
+.stat-green {
+    background-color: var(--pastel-green);
+    color: var(--pastel-green-text);
+}
+
+.stat-purple {
+    background-color: var(--pastel-purple);
+    color: var(--pastel-purple-text);
+}
+
+.stat-yellow {
+    background-color: var(--pastel-yellow);
+    color: var(--pastel-yellow-text);
+}
+
+/* Dashboard Layout Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 35px;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+
+.card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.card-title {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 18px;
+}
+
+.card-title svg {
+    color: var(--accent-active);
+}
+
+/* Contacts Row UI */
+.contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.contact-row:last-child {
+    border-bottom: none;
+}
+
+.contact-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.contact-value {
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.copy-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.copy-btn:hover {
+    color: var(--accent-active);
+    background: var(--accent-active-bg);
+}
+
+/* Data List Grid and Cards */
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 30px;
+}
+
+.data-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+
+.data-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.data-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--accent-active);
+}
+
+.data-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.data-card-title {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.data-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.action-btn:hover.edit {
+    color: var(--accent-active);
+    background: var(--accent-active-bg);
+    border-color: var(--accent-active);
+}
+
+.action-btn:hover.copy-all {
+    color: var(--pastel-blue-text);
+    background: rgba(139, 196, 242, 0.2);
+    border-color: var(--pastel-blue);
+}
+
+.action-btn:hover.delete {
+    color: var(--accent-red);
+    background: rgba(234, 112, 102, 0.1);
+    border-color: var(--accent-red);
+}
+
+.data-field {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border-color);
+}
+
+.data-field-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.data-field-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+    font-weight: 700;
+}
+
+.data-field-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Custom Bank Card Color Themes (Full Color Styles) */
+/* BCA - Full Color Turquoise */
+.data-card.bank-bca::before {
+    display: none;
+}
+.data-card.bank-bca {
+    background-color: #8cd4cb !important;
+    background-image: 
+        radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(0, 114, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 35%) !important;
+    border-color: rgba(13, 56, 50, 0.15) !important;
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .data-card-title {
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .data-card-title span {
+    color: rgba(13, 56, 50, 0.7) !important;
+}
+.data-card.bank-bca .data-field {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(13, 56, 50, 0.1) !important;
+}
+.data-card.bank-bca .data-field-value {
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .data-field-label {
+    color: rgba(13, 56, 50, 0.7) !important;
+}
+.data-card.bank-bca .copy-btn {
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .copy-btn:hover {
+    background: rgba(13, 56, 50, 0.1) !important;
+}
+.data-card.bank-bca .action-btn {
+    background: rgba(255, 255, 255, 0.4) !important;
+    color: #0d3832 !important;
+    border-color: rgba(13, 56, 50, 0.15) !important;
+}
+.data-card.bank-bca .action-btn:hover.edit,
+.data-card.bank-bca .action-btn:hover.copy-all {
+    background: rgba(13, 56, 50, 0.15) !important;
+}
+.data-card.bank-bca .btn-secondary {
+    background: rgba(255, 255, 255, 0.45) !important;
+    color: #0d3832 !important;
+    border-color: rgba(13, 56, 50, 0.15) !important;
+}
+.data-card.bank-bca .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* BNI - Full Color Orange */
+.data-card.bank-bni::before {
+    display: none;
+}
+.data-card.bank-bni {
+    background-color: #f2a379 !important;
+    background-image: 
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.28) 0%, transparent 45%),
+        radial-gradient(circle at 100% 100%, rgba(255, 61, 0, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, transparent 75%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 78%, transparent 78%) !important;
+    border-color: rgba(94, 35, 0, 0.15) !important;
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .data-card-title {
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .data-card-title span {
+    color: rgba(94, 35, 0, 0.7) !important;
+}
+.data-card.bank-bni .data-field {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(94, 35, 0, 0.1) !important;
+}
+.data-card.bank-bni .data-field-value {
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .data-field-label {
+    color: rgba(94, 35, 0, 0.7) !important;
+}
+.data-card.bank-bni .copy-btn {
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .copy-btn:hover {
+    background: rgba(94, 35, 0, 0.1) !important;
+}
+.data-card.bank-bni .action-btn {
+    background: rgba(255, 255, 255, 0.4) !important;
+    color: #5e2300 !important;
+    border-color: rgba(94, 35, 0, 0.15) !important;
+}
+.data-card.bank-bni .action-btn:hover.edit,
+.data-card.bank-bni .action-btn:hover.copy-all {
+    background: rgba(94, 35, 0, 0.15) !important;
+}
+.data-card.bank-bni .btn-secondary {
+    background: rgba(255, 255, 255, 0.45) !important;
+    color: #5e2300 !important;
+    border-color: rgba(94, 35, 0, 0.15) !important;
+}
+.data-card.bank-bni .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* BRI - Full Color White/Light Gray */
+.data-card.bank-bri::before {
+    display: none;
+}
+.data-card.bank-bri {
+    background-color: #ffffff !important;
+    background-image: 
+        radial-gradient(circle at 100% 20%, rgba(205, 162, 131, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(74, 62, 61, 0.02) 0%, transparent 40%),
+        linear-gradient(45deg, transparent 30%, rgba(74, 62, 61, 0.01) 30%, rgba(74, 62, 61, 0.01) 31%, transparent 31%) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+.data-card.bank-bri .data-card-title {
+    color: var(--text-primary) !important;
+}
+.data-card.bank-bri .data-card-title span {
+    color: var(--text-secondary) !important;
+}
+.data-card.bank-bri .data-field {
+    background: #fcfbf8 !important;
+    border-color: var(--border-color) !important;
+}
+.data-card.bank-bri .data-field-value {
+    color: var(--text-primary) !important;
+}
+.data-card.bank-bri .data-field-label {
+    color: var(--text-muted) !important;
+}
+.data-card.bank-bri .copy-btn {
+    color: var(--text-secondary) !important;
+}
+.data-card.bank-bri .copy-btn:hover {
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+.data-card.bank-bri .action-btn {
+    background: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+.data-card.bank-bri .action-btn:hover.edit,
+.data-card.bank-bri .action-btn:hover.copy-all {
+    background: var(--accent-active-bg) !important;
+    color: var(--accent-active) !important;
+}
+.data-card.bank-bri .btn-secondary {
+    background: #fcfbf8 !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+.data-card.bank-bri .btn-secondary:hover {
+    background: var(--bg-secondary) !important;
+}
+
+/* Mandiri - Full Color Yellow/Orange */
+.data-card.bank-mandiri::before {
+    display: none;
+}
+.data-card.bank-mandiri {
+    background-color: #ebb976 !important;
+    background-image: 
+        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 0% 0%, rgba(255, 215, 0, 0.12) 0%, transparent 50%),
+        linear-gradient(75deg, transparent 65%, rgba(255, 255, 255, 0.08) 65%, rgba(255, 255, 255, 0.08) 68%, transparent 68%) !important;
+    border-color: rgba(84, 53, 7, 0.15) !important;
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .data-card-title {
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .data-card-title span {
+    color: rgba(84, 53, 7, 0.7) !important;
+}
+.data-card.bank-mandiri .data-field {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(84, 53, 7, 0.1) !important;
+}
+.data-card.bank-mandiri .data-field-value {
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .data-field-label {
+    color: rgba(84, 53, 7, 0.7) !important;
+}
+.data-card.bank-mandiri .copy-btn {
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .copy-btn:hover {
+    background: rgba(84, 53, 7, 0.1) !important;
+}
+.data-card.bank-mandiri .action-btn {
+    background: rgba(255, 255, 255, 0.4) !important;
+    color: #543507 !important;
+    border-color: rgba(84, 53, 7, 0.15) !important;
+}
+.data-card.bank-mandiri .action-btn:hover.edit,
+.data-card.bank-mandiri .action-btn:hover.copy-all {
+    background: rgba(84, 53, 7, 0.15) !important;
+}
+.data-card.bank-mandiri .btn-secondary {
+    background: rgba(255, 255, 255, 0.45) !important;
+    color: #543507 !important;
+    border-color: rgba(84, 53, 7, 0.15) !important;
+}
+.data-card.bank-mandiri .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Social media left line accent */
+.data-card.social::before {
+    background: var(--pastel-purple);
+}
+
+/* Modals (Clean floating rounded card design) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(74, 62, 61, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transform: scale(0.9);
+    transition: var(--transition);
+}
+
+.modal-overlay.active .modal {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 18px;
+}
+
+.modal-header h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.close-modal {
+    background: transparent;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.close-modal:hover {
+    color: var(--accent-red);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 22px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+    .app-container {
+        grid-template-columns: 80px 1fr;
+    }
+    aside {
+        padding: 20px 10px;
+        margin: 10px;
+        height: calc(100vh - 20px);
+    }
+    .logo-text, .nav-item span, .sidebar-footer p, .lock-btn span {
+        display: none;
+    }
+    .nav-item {
+        justify-content: center;
+        padding: 14px;
+    }
+    .logo-section {
+        justify-content: center;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        grid-template-columns: 1fr;
+    }
+    aside {
+        display: none;
+    }
+    main {
+        padding: 20px;
+    }
+}
+
+/* Custom Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    align-items: center;
+}
+
+.toast {
+    background: #4a3e3d; /* matches var(--text-primary) */
+    color: #ffffff;
+    padding: 14px 28px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 10px 30px rgba(74, 62, 61, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: auto;
+    animation: toastSlideDownFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.fade-out {
+    opacity: 0;
+    transform: translateY(-15px);
+}
+
+@keyframes toastSlideDownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Highlighted contacts on dashboard */
+.contact-row-highlighted {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-active);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(74, 62, 61, 0.01);
+}
+
+.contact-row-highlighted:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+}
+
+.contact-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    background: rgba(205, 162, 131, 0.1);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contact-label-new {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.contact-value-new {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.contact-value-new.empty {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-style: italic;
+}
+
+.contact-note-bubble {
+    margin-top: 8px;
+    background: rgba(74, 62, 61, 0.04);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    border: 1px solid rgba(74, 62, 61, 0.05);
+    display: inline-block;
+}
+
+/* Sub Tab Switcher for BANK DP & WD */
+.sub-tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    background: rgba(74, 62, 61, 0.04);
+    padding: 5px;
+    border-radius: var(--radius-md);
+    width: fit-content;
+    border: 1px solid var(--border-color);
+}
+
+.sub-tab-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.sub-tab-item:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.sub-tab-item.active {
+    background: #ffffff;
+    color: var(--text-primary);
+    box-shadow: 0 4px 15px rgba(74, 62, 61, 0.05);
+}
+
+.sub-tab-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.dp-dot { background-color: #97dcb9; } /* matches --pastel-green */
+.wd-dot { background-color: #ea7066; } /* matches --accent-red */
+.pulsa-dot { background-color: var(--pastel-purple); }
+
+/* Category Tags on Bank Cards */
+.category-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: var(--radius-sm);
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    height: 18px;
+    vertical-align: middle;
+}
+
+.category-tag.dp {
+    background-color: var(--pastel-green);
+    color: var(--pastel-green-text);
+}
+
+.category-tag.wd {
+    background-color: rgba(234, 112, 102, 0.15);
+    color: var(--accent-red);
+    border: 1px solid rgba(234, 112, 102, 0.2);
+}
+
+/* Adjust category tags inside custom themed bank cards */
+.data-card.bank-bca .category-tag.dp {
+    background-color: rgba(13, 56, 50, 0.15) !important;
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .category-tag.wd {
+    background-color: rgba(234, 112, 102, 0.25) !important;
+    color: #0d3832 !important;
+    border: 1px solid rgba(13, 56, 50, 0.1) !important;
+}
+
+.data-card.bank-bni .category-tag.dp {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .category-tag.wd {
+    background-color: rgba(94, 35, 0, 0.15) !important;
+    color: #5e2300 !important;
+    border: 1px solid rgba(94, 35, 0, 0.1) !important;
+}
+
+.data-card.bank-mandiri .category-tag.dp {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .category-tag.wd {
+    background-color: rgba(84, 53, 7, 0.15) !important;
+    color: #543507 !important;
+    border: 1px solid rgba(84, 53, 7, 0.1) !important;
+}
+
+/* Warning Banner */
+.warning-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(234, 112, 102, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(234, 112, 102, 0.2);
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: 25px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    font-family: var(--font-heading);
+}
+
+.warning-banner svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+/* Pulsa card left accent */
+.data-card.pulsa-card::before {
+    background: var(--pastel-purple);
+}
+
+
+</style>
