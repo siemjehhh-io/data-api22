@@ -29,7 +29,7 @@ $action = {
             Write-Host "Successfully deployed $name and restarted PM2 backend!" -ForegroundColor Green
         }
     } catch {
-        Write-Host "Error deploying $name: $_" -ForegroundColor Red
+        Write-Host "Error deploying ${name}: $_" -ForegroundColor Red
     }
 }
 
