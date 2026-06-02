@@ -181,10 +181,10 @@ function renderContacts() {
         const tgPhone = db.mainContacts.tgPhone || { value: "", note: "" };
         
         const contactsList = [
-            { key: 'phone', label: 'No. Telepon Utama', data: phone, icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>` },
-            { key: 'wa', label: 'No. WhatsApp Utama', data: wa, icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-green-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>` },
-            { key: 'tg', label: 'Username Telegram Utama', data: tg, icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>` },
-            { key: 'tgPhone', label: 'No. Telepon Telegram Utama', data: tgPhone, icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>` }
+            { key: 'phone', label: 'No. Telepon Utama', data: phone, icon: '<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>' },
+            { key: 'wa', label: 'No. WhatsApp Utama', data: wa, icon: '<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-green-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>' },
+            { key: 'tg', label: 'Username Telegram Utama', data: tg, icon: '<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>' },
+            { key: 'tgPhone', label: 'No. Telepon Telegram Utama', data: tgPhone, icon: '<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>' }
         ];
         
         contactsList.forEach(c => {
@@ -192,25 +192,9 @@ function renderContacts() {
             row.className = 'contact-row-highlighted';
             const hasVal = !!c.data.value;
             const displayVal = hasVal ? c.data.value : 'Belum diisi';
-            const noteHtml = c.data.note ? `<div class="contact-note-bubble">${escapeHTML(c.data.note)}</div>` : '';
-            const copyButton = hasVal ? `
-                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(c.data.value)}')" title="Salin">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                </button>
-            ` : '';
-            row.innerHTML = `
-                <div style="display: flex; align-items: flex-start; gap: 12px; width: 100%;">
-                    <div class="contact-icon-wrapper">${c.icon}</div>
-                    <div style="flex-grow: 1;">
-                        <div class="contact-label-new">${c.label}</div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
-                            <span class="contact-value-new ${hasVal ? 'filled' : 'empty'}">${escapeHTML(displayVal)}</span>
-                            ${copyButton}
-                        </div>
-                        ${noteHtml}
-                    </div>
-                </div>
-            `;
+            const noteHtml = c.data.note ? '<div class="contact-note-bubble">' + (escapeHTML(c.data.note)) + '</div>' : '';
+            const copyButton = hasVal ? '\n                <button class="copy-btn" onclick="copyRawText(\'' + (escapeJSVal(c.data.value)) + '\')" title="Salin">\n                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>\n                </button>\n            ' : '';
+            row.innerHTML = '\n                <div style="display: flex; align-items: flex-start; gap: 12px; width: 100%;">\n                    <div class="contact-icon-wrapper">' + (c.icon) + '</div>\n                    <div style="flex-grow: 1;">\n                        <div class="contact-label-new">' + (c.label) + '</div>\n                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">\n                            <span class="contact-value-new ' + (hasVal ? 'filled' : 'empty') + '">' + (escapeHTML(displayVal)) + '</span>\n                            ' + (copyButton) + '\n                        </div>\n                        ' + (noteHtml) + '\n                    </div>\n                </div>\n            ';
             mainContainer.appendChild(row);
         });
     }
@@ -226,41 +210,17 @@ function renderContacts() {
         backupList.forEach(bc => {
             let icon = '';
             if (bc.type === 'wa') {
-                icon = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; color: var(--pastel-green-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>`;
+                icon = '<svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; color: var(--pastel-green-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>';
             } else if (bc.type === 'tg') {
-                icon = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>`;
+                icon = '<svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>';
             } else {
-                icon = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>`;
+                icon = '<svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>';
             }
             const row = document.createElement('div');
             row.className = 'contact-row-highlighted';
             row.style.borderLeftColor = bc.type === 'wa' ? 'var(--pastel-green)' : (bc.type === 'tg' ? 'var(--pastel-blue)' : 'var(--accent-active)');
-            const noteHtml = bc.note ? `<div class="contact-note-bubble">${escapeHTML(bc.note)}</div>` : '';
-            row.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-                    <div style="display: flex; gap: 12px; flex-grow: 1;">
-                        <div class="contact-icon-wrapper" style="background: rgba(0,0,0,0.03);">${icon}</div>
-                        <div style="flex-grow: 1;">
-                            <div class="contact-label-new">${escapeHTML(bc.name)} <span style="font-weight: normal; opacity: 0.7; font-size: 0.8rem;">(${bc.type.toUpperCase()})</span></div>
-                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
-                                <span class="contact-value-new filled">${escapeHTML(bc.value)}</span>
-                                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(bc.value)}')" title="Salin">
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                </button>
-                            </div>
-                            ${noteHtml}
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 6px; align-items: center; margin-left: 10px; flex-shrink: 0;">
-                        <button class="action-btn edit" onclick="editBackupContact('${bc.id}')" title="Edit" style="width: 28px; height: 28px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteBackupContact('${bc.id}')" title="Hapus" style="width: 28px; height: 28px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    </div>
-                </div>
-            `;
+            const noteHtml = bc.note ? '<div class="contact-note-bubble">' + (escapeHTML(bc.note)) + '</div>' : '';
+            row.innerHTML = '\n                <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">\n                    <div style="display: flex; gap: 12px; flex-grow: 1;">\n                        <div class="contact-icon-wrapper" style="background: rgba(0,0,0,0.03);">' + (icon) + '</div>\n                        <div style="flex-grow: 1;">\n                            <div class="contact-label-new">' + (escapeHTML(bc.name)) + ' <span style="font-weight: normal; opacity: 0.7; font-size: 0.8rem;">(' + (bc.type.toUpperCase()) + ')</span></div>\n                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">\n                                <span class="contact-value-new filled">' + (escapeHTML(bc.value)) + '</span>\n                                <button class="copy-btn" onclick="copyRawText(\'' + (escapeJSVal(bc.value)) + '\')" title="Salin">\n                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>\n                                </button>\n                            </div>\n                            ' + (noteHtml) + '\n                        </div>\n                    </div>\n                    <div style="display: flex; gap: 6px; align-items: center; margin-left: 10px; flex-shrink: 0;">\n                        <button class="action-btn edit" onclick="editBackupContact(\'' + (bc.id) + '\')" title="Edit" style="width: 28px; height: 28px;">\n                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>\n                        </button>\n                        <button class="action-btn delete" onclick="deleteBackupContact(\'' + (bc.id) + '\')" title="Hapus" style="width: 28px; height: 28px;">\n                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>\n                        </button>\n                    </div>\n                </div>\n            ';
             backupContainer.appendChild(row);
         });
     }
@@ -292,40 +252,10 @@ function renderBanks() {
                 else if (diffVal === '0') diffStyle = 'color: var(--text-secondary); font-weight: normal;';
                 else diffStyle = 'color: var(--pastel-green-text); font-weight: bold;';
             }
-            let fieldsHtml = `
-                <div class="data-card-header">
-                    <div class="data-card-title">
-                        ${escapeHTML(item.name)}
-                        <span class="category-tag pulsa" style="background-color: var(--pastel-purple); color: var(--pastel-purple-text); margin-left: 8px;">PULSA</span>
-                    </div>
-                    <div class="data-card-actions">
-                        <button class="action-btn edit" onclick="editPulsa('${item.id}')" title="Edit">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                        </button>
-                        <button class="action-btn delete" onclick="deletePulsa('${item.id}')" title="Hapus">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="data-field">
-                    <div class="data-field-info">
-                        <span class="data-field-label">Nomor Telepon</span>
-                        <span class="data-field-value" id="phone-${item.id}">${escapeHTML(item.phone)}</span>
-                    </div>
-                    <button class="copy-btn" onclick="copyText('phone-${item.id}')" title="Salin Nomor">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                    </button>
-                </div>
-                <div class="data-field">
-                    <div class="data-field-info">
-                        <span class="data-field-label">Masa Aktif</span>
-                        <span class="data-field-value">${escapeHTML(formatDisplayDate(item.activePeriod))}</span>
-                    </div>
-                </div>
-            `;
-            if (item.balance) fieldsHtml += `<div class="data-field"><div class="data-field-info"><span class="data-field-label">Saldo Akhir</span><span class="data-field-value">${escapeHTML(item.balance)}</span></div></div>`;
-            if (item.difference) fieldsHtml += `<div class="data-field"><div class="data-field-info"><span class="data-field-label">Selisih</span><span class="data-field-value" style="${diffStyle}">${escapeHTML(item.difference)}</span></div></div>`;
-            if (item.note) fieldsHtml += `<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.04); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary); border: 1px solid var(--border-color);"><strong>Keterangan:</strong> ${escapeHTML(item.note)}</div>`;
+            let fieldsHtml = '\n                <div class="data-card-header">\n                    <div class="data-card-title">\n                        ' + (escapeHTML(item.name)) + '\n                        <span class="category-tag pulsa" style="background-color: var(--pastel-purple); color: var(--pastel-purple-text); margin-left: 8px;">PULSA</span>\n                    </div>\n                    <div class="data-card-actions">\n                        <button class="action-btn edit" onclick="editPulsa(\'' + (item.id) + '\')" title="Edit">\n                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>\n                        </button>\n                        <button class="action-btn delete" onclick="deletePulsa(\'' + (item.id) + '\')" title="Hapus">\n                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>\n                        </button>\n                    </div>\n                </div>\n                <div class="data-field">\n                    <div class="data-field-info">\n                        <span class="data-field-label">Nomor Telepon</span>\n                        <span class="data-field-value" id="phone-' + (item.id) + '">' + (escapeHTML(item.phone)) + '</span>\n                    </div>\n                    <button class="copy-btn" onclick="copyText(\'phone-' + (item.id) + '\')" title="Salin Nomor">\n                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>\n                    </button>\n                </div>\n                <div class="data-field">\n                    <div class="data-field-info">\n                        <span class="data-field-label">Masa Aktif</span>\n                        <span class="data-field-value">' + (escapeHTML(formatDisplayDate(item.activePeriod))) + '</span>\n                    </div>\n                </div>\n            ';
+            if (item.balance) fieldsHtml += '<div class="data-field"><div class="data-field-info"><span class="data-field-label">Saldo Akhir</span><span class="data-field-value">' + (escapeHTML(item.balance)) + '</span></div></div>';
+            if (item.difference) fieldsHtml += '<div class="data-field"><div class="data-field-info"><span class="data-field-label">Selisih</span><span class="data-field-value" style="' + (diffStyle) + '">' + (escapeHTML(item.difference)) + '</span></div></div>';
+            if (item.note) fieldsHtml += '<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.04); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary); border: 1px solid var(--border-color);"><strong>Keterangan:</strong> ' + (escapeHTML(item.note)) + '</div>';
             card.innerHTML = fieldsHtml;
             container.appendChild(card);
         });
@@ -335,7 +265,7 @@ function renderBanks() {
     const filteredBanks = db.banks.filter(bank => (bank.category || 'dp') === currentBankFilter);
     if (filteredBanks.length === 0) {
         let emptyMsg = currentBankFilter === 'dp' ? 'Belum ada data BANK DP (Deposit).' : 'Belum ada data BANK WD (Withdrawal).';
-        container.innerHTML = `<div style="color: var(--text-muted); grid-column: span 3; text-align: center; padding: 40px;">${emptyMsg} Klik "Tambah Bank" di atas.</div>`;
+        container.innerHTML = '<div style="color: var(--text-muted); grid-column: span 3; text-align: center; padding: 40px;">' + (emptyMsg) + ' Klik "Tambah Bank" di atas.</div>';
         return;
     }
     
@@ -344,35 +274,14 @@ function renderBanks() {
         const nameLower = (bank.name || '').toLowerCase();
         let bankClass = nameLower.includes('bca') ? 'bank-bca' : nameLower.includes('bni') ? 'bank-bni' : nameLower.includes('bri') ? 'bank-bri' : nameLower.includes('mandiri') ? 'bank-mandiri' : '';
         const card = document.createElement('div');
-        card.className = `data-card bank ${bankClass}`;
-        let fieldsHtml = `
-            <div class="data-card-header">
-                <div class="data-card-title">
-                    ${escapeHTML(bank.name)} 
-                    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary); opacity: 0.8;">(${escapeHTML(typeLabel)})</span>
-                    <span class="category-tag ${bank.category || 'dp'}">${(bank.category || 'dp').toUpperCase()}</span>
-                </div>
-                <div class="data-card-actions">
-                    <button class="action-btn copy-all" onclick="copyAllBankData('${bank.id}')" title="Salin Semua Data">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                    </button>
-                    <button class="action-btn edit" onclick="editBank('${bank.id}')" title="Edit">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                    </button>
-                    <button class="action-btn delete" onclick="deleteBank('${bank.id}')" title="Hapus">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="data-field"><div class="data-field-info"><span class="data-field-label">No. Rekening</span><span class="data-field-value">${escapeHTML(bank.accountNo)}</span></div></div>
-            <div class="data-field"><div class="data-field-info"><span class="data-field-label">Atas Nama (A/N)</span><span class="data-field-value">${escapeHTML(bank.accountName)}</span></div></div>
-        `;
-        if (bank.user) fieldsHtml += `<div class="data-field"><div class="data-field-info"><span class="data-field-label">Username Login</span><span class="data-field-value">${escapeHTML(bank.user)}</span></div></div>`;
-        if (bank.corpId) fieldsHtml += `<div class="data-field"><div class="data-field-info"><span class="data-field-label">Corporate ID</span><span class="data-field-value">${escapeHTML(bank.corpId)}</span></div></div>`;
-        if (bank.password) fieldsHtml += `<div class="data-field"><div class="data-field-info"><span class="data-field-label">Password Login</span><span class="data-field-value">${escapeHTML(bank.password)}</span></div></div>`;
-        if (bank.pin) fieldsHtml += `<div class="data-field"><div class="data-field-info"><span class="data-field-label">PIN Transaksi / Login</span><span class="data-field-value">${escapeHTML(bank.pin)}</span></div></div>`;
-        if (bank.url) fieldsHtml += `<div style="margin-top: 15px; display: flex; gap: 10px; width: 100%;"><a href="${escapeHTML(bank.url)}" target="_blank" class="btn-secondary" style="flex-grow: 1; font-size: 0.85rem; padding: 10px 12px; justify-content: center; margin: 0; display: flex; align-items: center; gap: 8px; text-decoration: none;">Buka Link e-Banking<svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a><button class="btn-secondary" onclick="copyRawText('${escapeJSVal(bank.url)}')" title="Salin Link" style="flex-shrink: 0; padding: 10px 14px; justify-content: center; margin: 0; display: flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button></div>`;
-        if (bank.note) fieldsHtml += `<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary);"><strong>Catatan:</strong> ${escapeHTML(bank.note)}</div>`;
+        card.className = 'data-card bank ' + (bankClass) + '';
+        let fieldsHtml = '\n            <div class="data-card-header">\n                <div class="data-card-title">\n                    ' + (escapeHTML(bank.name)) + ' \n                    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary); opacity: 0.8;">(' + (escapeHTML(typeLabel)) + ')</span>\n                    <span class="category-tag ' + (bank.category || 'dp') + '">' + ((bank.category || 'dp').toUpperCase()) + '</span>\n                </div>\n                <div class="data-card-actions">\n                    <button class="action-btn copy-all" onclick="copyAllBankData(\'' + (bank.id) + '\')" title="Salin Semua Data">\n                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>\n                    </button>\n                    <button class="action-btn edit" onclick="editBank(\'' + (bank.id) + '\')" title="Edit">\n                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>\n                    </button>\n                    <button class="action-btn delete" onclick="deleteBank(\'' + (bank.id) + '\')" title="Hapus">\n                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>\n                    </button>\n                </div>\n            </div>\n            <div class="data-field"><div class="data-field-info"><span class="data-field-label">No. Rekening</span><span class="data-field-value">' + (escapeHTML(bank.accountNo)) + '</span></div></div>\n            <div class="data-field"><div class="data-field-info"><span class="data-field-label">Atas Nama (A/N)</span><span class="data-field-value">' + (escapeHTML(bank.accountName)) + '</span></div></div>\n        ';
+        if (bank.user) fieldsHtml += '<div class="data-field"><div class="data-field-info"><span class="data-field-label">Username Login</span><span class="data-field-value">' + (escapeHTML(bank.user)) + '</span></div></div>';
+        if (bank.corpId) fieldsHtml += '<div class="data-field"><div class="data-field-info"><span class="data-field-label">Corporate ID</span><span class="data-field-value">' + (escapeHTML(bank.corpId)) + '</span></div></div>';
+        if (bank.password) fieldsHtml += '<div class="data-field"><div class="data-field-info"><span class="data-field-label">Password Login</span><span class="data-field-value">' + (escapeHTML(bank.password)) + '</span></div></div>';
+        if (bank.pin) fieldsHtml += '<div class="data-field"><div class="data-field-info"><span class="data-field-label">PIN Transaksi / Login</span><span class="data-field-value">' + (escapeHTML(bank.pin)) + '</span></div></div>';
+        if (bank.url) fieldsHtml += '<div style="margin-top: 15px; display: flex; gap: 10px; width: 100%;"><a href="' + (escapeHTML(bank.url)) + '" target="_blank" class="btn-secondary" style="flex-grow: 1; font-size: 0.85rem; padding: 10px 12px; justify-content: center; margin: 0; display: flex; align-items: center; gap: 8px; text-decoration: none;">Buka Link e-Banking<svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a><button class="btn-secondary" onclick="copyRawText(\'' + (escapeJSVal(bank.url)) + '\')" title="Salin Link" style="flex-shrink: 0; padding: 10px 14px; justify-content: center; margin: 0; display: flex; align-items: center;"><svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button></div>';
+        if (bank.note) fieldsHtml += '<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary);"><strong>Catatan:</strong> ' + (escapeHTML(bank.note)) + '</div>';
         card.innerHTML = fieldsHtml;
         container.appendChild(card);
     });
@@ -385,16 +294,13 @@ function renderSocials() {
     db.socials.forEach(soc => {
         const card = document.createElement('div');
         card.className = 'data-card social';
-        card.innerHTML = `
-            <div class="data-card-header"><div class="data-card-title">${escapeHTML(soc.platform)}</div><div class="data-card-actions">
-                <button class="action-btn edit" onclick="editSocial('${soc.id}')" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>
-                <button class="action-btn delete" onclick="deleteSocial('${soc.id}')" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
-            </div></div>
-            <div class="data-field"><div class="data-field-info"><span class="data-field-label">Username / Email</span><span class="data-field-value" id="user-${soc.id}">${escapeHTML(soc.user)}</span></div><button class="copy-btn" onclick="copyText('user-${soc.id}')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button></div>
-            <div class="data-field"><div class="data-field-info" style="flex-grow: 1;"><span class="data-field-label">Password</span><span class="data-field-value" id="pass-${soc.id}">${escapeHTML(soc.password || '-')}</span></div>${soc.password ? `<button class="copy-btn" onclick="copyText('pass-${soc.id}')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button>` : ''}</div>
-            ${soc.url ? `<div style="margin-top: 15px;"><a href="${escapeHTML(soc.url)}" target="_blank" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 12px; justify-content: center; width: 100%;">Buka Halaman Login<svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a></div>` : ''}
-            ${soc.note ? `<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary);"><strong>Catatan:</strong> ${escapeHTML(soc.note)}</div>` : ''}
-        `;
+        
+        // Extract nested template literals into separate single-quoted variables
+        const socCopyBtn = soc.password ? '<button class="copy-btn" onclick="copyText(\'pass-' + soc.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button>' : '';
+        const socUrlHtml = soc.url ? '<div style="margin-top: 15px;"><a href="' + escapeHTML(soc.url) + '" target="_blank" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 12px; justify-content: center; width: 100%;">Buka Halaman Login<svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a></div>' : '';
+        const socNoteHtml = soc.note ? '<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary);"><strong>Catatan:</strong> ' + escapeHTML(soc.note) + '</div>' : '';
+
+        card.innerHTML = '\n            <div class="data-card-header"><div class="data-card-title">' + (escapeHTML(soc.platform)) + '</div><div class="data-card-actions">\n                <button class="action-btn edit" onclick="editSocial(\'' + (soc.id) + '\')" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>\n                <button class="action-btn delete" onclick="deleteSocial(\'' + (soc.id) + '\')" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>\n            </div></div>\n            <div class="data-field"><div class="data-field-info"><span class="data-field-label">Username / Email</span><span class="data-field-value" id="user-' + (soc.id) + '">' + (escapeHTML(soc.user)) + '</span></div><button class="copy-btn" onclick="copyText(\'user-' + (soc.id) + '\')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button></div>\n            <div class="data-field"><div class="data-field-info" style="flex-grow: 1;"><span class="data-field-label">Password</span><span class="data-field-value" id="pass-' + (soc.id) + '">' + (escapeHTML(soc.password || '-')) + '</span></div>' + (socCopyBtn) + '</div>\n            ' + (socUrlHtml) + '\n            ' + (socNoteHtml) + '\n        ';
         container.appendChild(card);
     });
 }
@@ -406,16 +312,13 @@ function renderQris() {
     db.qris.forEach(q => {
         const card = document.createElement('div');
         card.className = 'data-card';
-        card.innerHTML = `
-            <div class="data-card-header"><div class="data-card-title">${escapeHTML(q.name)}</div><div class="data-card-actions">
-                <button class="action-btn edit" onclick="editQris('${q.id}')" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>
-                <button class="action-btn delete" onclick="deleteQris('${q.id}')" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
-            </div></div>
-            <div class="data-field"><div class="data-field-info"><span class="data-field-label">Username / Merchant ID</span><span class="data-field-value" id="user-${q.id}">${escapeHTML(q.user)}</span></div><button class="copy-btn" onclick="copyText('user-${q.id}')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button></div>
-            <div class="data-field"><div class="data-field-info" style="flex-grow: 1;"><span class="data-field-label">Password / Secret Key</span><span class="data-field-value" id="pass-${q.id}">${escapeHTML(q.password || '-')}</span></div>${q.password ? `<button class="copy-btn" onclick="copyText('pass-${q.id}')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button>` : ''}</div>
-            ${q.url ? `<div style="margin-top: 15px;"><a href="${escapeHTML(q.url)}" target="_blank" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 12px; justify-content: center; width: 100%;">Buka Dashboard QRIS<svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a></div>` : ''}
-            ${q.note ? `<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary);"><strong>Catatan:</strong> ${escapeHTML(q.note)}</div>` : ''}
-        `;
+        
+        // Extract nested template literals into separate single-quoted variables
+        const qrisCopyBtn = q.password ? '<button class="copy-btn" onclick="copyText(\'pass-' + q.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button>' : '';
+        const qrisUrlHtml = q.url ? '<div style="margin-top: 15px;"><a href="' + escapeHTML(q.url) + '" target="_blank" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 12px; justify-content: center; width: 100%;">Buka Dashboard QRIS<svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg></a></div>' : '';
+        const qrisNoteHtml = q.note ? '<div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary);"><strong>Catatan:</strong> ' + escapeHTML(q.note) + '</div>' : '';
+
+        card.innerHTML = '\n            <div class="data-card-header"><div class="data-card-title">' + (escapeHTML(q.name)) + '</div><div class="data-card-actions">\n                <button class="action-btn edit" onclick="editQris(\'' + (q.id) + '\')" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>\n                <button class="action-btn delete" onclick="deleteQris(\'' + (q.id) + '\')" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>\n            </div></div>\n            <div class="data-field"><div class="data-field-info"><span class="data-field-label">Username / Merchant ID</span><span class="data-field-value" id="user-' + (q.id) + '">' + (escapeHTML(q.user)) + '</span></div><button class="copy-btn" onclick="copyText(\'user-' + (q.id) + '\')"><svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></button></div>\n            <div class="data-field"><div class="data-field-info" style="flex-grow: 1;"><span class="data-field-label">Password / Secret Key</span><span class="data-field-value" id="pass-' + (q.id) + '">' + (escapeHTML(q.password || '-')) + '</span></div>' + (qrisCopyBtn) + '</div>\n            ' + (qrisUrlHtml) + '\n            ' + (qrisNoteHtml) + '\n        ';
         container.appendChild(card);
     });
 }
@@ -734,8 +637,8 @@ async function clearAllData() {
 function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    document.getElementById(`${tabName}Tab`).style.display = 'block';
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById('' + (tabName) + 'Tab').style.display = 'block';
+    document.querySelector('[data-tab="' + (tabName) + '"]').classList.add('active');
 }
 
 function switchBankFilter(filterVal) {
@@ -809,11 +712,11 @@ function copyAllBankData(bankId) {
     const accountNameUpper = (bank.accountName || '').toUpperCase();
     const type = bank.type || 'custom';
     let serviceHeader = type.includes('mbanking') ? 'MOBILE BANKING' : type === 'bni_wondr' ? 'WONDR BY BNI' : type === 'mybca' ? 'MYBCA' : 'INTERNET BANKING';
-    let text = `${accountNameUpper} - ${nameUpper} / ${bank.accountNo}\n\n${serviceHeader}\n\n`;
-    if (bank.corpId) text += `- CORPORATE ID : ${bank.corpId}\n`;
-    if (bank.user) text += `- USER ID : ${bank.user}\n`;
-    if (bank.pin) text += `- PIN : ${bank.pin}\n`;
-    if (bank.password) { const isBca = nameUpper.includes('BCA') || type.includes('bca'); text += `- ${isBca ? 'KEYBCA' : 'PASSWORD'} : ${bank.password}\n`; }
+    let text = '' + (accountNameUpper) + ' - ' + (nameUpper) + ' / ' + (bank.accountNo) + '\n\n' + (serviceHeader) + '\n\n';
+    if (bank.corpId) text += '- CORPORATE ID : ' + (bank.corpId) + '\n';
+    if (bank.user) text += '- USER ID : ' + (bank.user) + '\n';
+    if (bank.pin) text += '- PIN : ' + (bank.pin) + '\n';
+    if (bank.password) { const isBca = nameUpper.includes('BCA') || type.includes('bca'); text += '- ' + (isBca ? 'KEYBCA' : 'PASSWORD') + ' : ' + (bank.password) + '\n'; }
     navigator.clipboard.writeText(text.trim()).then(() => showToast('Data bank berhasil disalin!')).catch(() => showToast('Gagal menyalin.'));
 }
 
@@ -826,9 +729,9 @@ function customDialog({ title, message, isConfirm = false, okText = 'OK', cancel
         dialogCard.className = 'modal';
         dialogCard.style.cssText = 'max-width: 420px; padding: 35px 30px; text-align: center;';
         let buttonsHtml = isConfirm
-            ? `<div style="display: flex; gap: 15px; margin-top: 25px; width: 100%;"><button class="btn-secondary" id="dialogCancelBtn" style="flex: 1; justify-content: center; margin: 0; padding: 12px 20px; font-size: 0.95rem;">${escapeHTML(cancelText)}</button><button class="btn-primary" id="dialogOkBtn" style="flex: 1; justify-content: center; margin: 0; padding: 12px 20px; font-size: 0.95rem;">${escapeHTML(okText)}</button></div>`
-            : `<div style="display: flex; margin-top: 25px; width: 100%;"><button class="btn-primary" id="dialogOkBtn" style="width: 100%; justify-content: center; margin: 0; padding: 12px 20px; font-size: 0.95rem;">${escapeHTML(okText)}</button></div>`;
-        dialogCard.innerHTML = `<div style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">${escapeHTML(title || 'Pemberitahuan')}</div><div style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin-bottom: 10px;">${escapeHTML(message)}</div>${buttonsHtml}`;
+            ? '<div style="display: flex; gap: 15px; margin-top: 25px; width: 100%;"><button class="btn-secondary" id="dialogCancelBtn" style="flex: 1; justify-content: center; margin: 0; padding: 12px 20px; font-size: 0.95rem;">' + (escapeHTML(cancelText)) + '</button><button class="btn-primary" id="dialogOkBtn" style="flex: 1; justify-content: center; margin: 0; padding: 12px 20px; font-size: 0.95rem;">' + (escapeHTML(okText)) + '</button></div>'
+            : '<div style="display: flex; margin-top: 25px; width: 100%;"><button class="btn-primary" id="dialogOkBtn" style="width: 100%; justify-content: center; margin: 0; padding: 12px 20px; font-size: 0.95rem;">' + (escapeHTML(okText)) + '</button></div>';
+        dialogCard.innerHTML = '<div style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">' + (escapeHTML(title || 'Pemberitahuan')) + '</div><div style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin-bottom: 10px;">' + (escapeHTML(message)) + '</div>' + (buttonsHtml) + '';
         overlay.appendChild(dialogCard);
         document.body.appendChild(overlay);
         setTimeout(() => overlay.classList.add('active'), 10);
@@ -846,7 +749,7 @@ function showToast(message) {
     if (!container) { container = document.createElement('div'); container.id = 'toastContainer'; container.className = 'toast-container'; document.body.appendChild(container); }
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-green);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>${escapeHTML(message)}</span>`;
+    toast.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-green);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>' + (escapeHTML(message)) + '</span>';
     container.appendChild(toast);
     setTimeout(() => { toast.classList.add('fade-out'); setTimeout(() => { toast.remove(); if (container.children.length === 0) container.remove(); }, 300); }, 2500);
 }
@@ -875,7 +778,7 @@ function formatDisplayDate(dStr) {
     const parts = dStr.split('-');
     if (parts.length === 3 && parts[0].length === 4) {
         const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-        return `${parts[2]} ${months[parseInt(parts[1],10)-1] || parts[1]} ${parts[0]}`;
+        return '' + (parts[2]) + ' ' + (months[parseInt(parts[1],10)-1] || parts[1]) + ' ' + (parts[0]) + '';
     }
     return dStr;
 }
