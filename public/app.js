@@ -136,6 +136,13 @@ function resetToLocalServerSettings() {
     setTimeout(() => window.location.reload(), 1500);
 }
 
+function resetToLocalMode() {
+    localStorage.setItem('pin88_db_mode', 'local');
+    localStorage.removeItem('pin88_gas_url');
+    showToast('Mengalihkan ke database Vercel KV...');
+    setTimeout(() => window.location.reload(), 1000);
+}
+
 function testSetupGasUrl() {
     const gasUrl = document.getElementById('setupGasUrl').value.trim();
     if (!gasUrl) {
@@ -182,10 +189,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         showAlert("PERINGATAN: Library keamanan CryptoJS gagal dimuat secara lokal. Pastikan file 'crypto-js.min.js' ada di folder yang sama dengan 'index.html'.", "Peringatan Sistem");
     }
     
-    // Auto-detect Vercel/Cloud Deployment
-    const isCloud = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-    if (isCloud && !localStorage.getItem('pin88_db_mode')) {
-        localStorage.setItem('pin88_db_mode', 'sheets');
+    // Default to 'local' mode (which on Vercel connects to our Serverless Vercel KV API)
+    if (!localStorage.getItem('pin88_db_mode')) {
+        localStorage.setItem('pin88_db_mode', 'local');
     }
     
     const dbMode = getDbMode();
