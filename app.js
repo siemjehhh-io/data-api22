@@ -16,12 +16,199 @@ let db = {
     pulsa: []
 };
 
+// ============================================================
+// Google Sheets Database API Integration (Vercel Mode)
+// ============================================================
+
+function getDbMode() {
+    return localStorage.getItem('pin88_db_mode') || 'local';
+}
+
+function callSheetsAPI(action, data, successCallback, failureCallback) {
+    const gasUrl = localStorage.getItem('pin88_gas_url');
+    if (!gasUrl) {
+        if (failureCallback) failureCallback(new Error("URL Google Apps Script belum dikonfigurasi."));
+        return;
+    }
+    
+    const payload = {
+        action: action,
+        data: data
+    };
+    if (data && typeof data === 'string') {
+        payload.id = data;
+    } else if (data && data.id) {
+        payload.id = data.id;
+    }
+    
+    fetch(gasUrl, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+        return response.json();
+    })
+    .then(result => {
+        if (result && result.success) {
+            if (successCallback) successCallback(result);
+        } else {
+            throw new Error(result ? result.error : "Gagal memproses request.");
+        }
+    })
+    .catch(err => {
+        console.error("Sheets API Error:", err);
+        if (failureCallback) failureCallback(err);
+    });
+}
+
+function loadAllDataFromSheets(callback) {
+    showLoadingOverlay('Memuat data dari Google Sheets...');
+    callSheetsAPI('getAllData', null, function(result) {
+        hideLoadingOverlay();
+        if (result && result.db) {
+            db = result.db;
+            renderApp();
+            if (callback) callback();
+        }
+    }, function(err) {
+        hideLoadingOverlay();
+        showAlert('Gagal memuat data dari Google Sheets: ' + err.message + '\n\nPastikan SPREADSHEET_ID di Code.gs sudah diisi dengan benar.', 'Error Koneksi');
+    });
+}
+
+function toggleDbModeSettings() {
+    const mode = document.getElementById('dbModeSelect').value;
+    const fieldsDiv = document.getElementById('gasSettingsFields');
+    if (mode === 'sheets') {
+        fieldsDiv.style.display = 'block';
+        document.getElementById('gasWebAppUrlInput').value = localStorage.getItem('pin88_gas_url') || '';
+    } else {
+        fieldsDiv.style.display = 'none';
+    }
+}
+
+function saveGasSettings() {
+    const gasUrl = document.getElementById('gasWebAppUrlInput').value.trim();
+    if (!gasUrl) {
+        showAlert('Silakan masukkan URL Web App Google Script!', 'Peringatan');
+        return;
+    }
+    
+    showLoadingOverlay('Menghubungkan ke Google Sheets...');
+    fetch(gasUrl, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'initSheets' })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        return res.json();
+    })
+    .then(result => {
+        hideLoadingOverlay();
+        if (result && result.success) {
+            localStorage.setItem('pin88_db_mode', 'sheets');
+            localStorage.setItem('pin88_gas_url', gasUrl);
+            showToast('Koneksi Google Sheets berhasil dihubungkan!');
+            loadAllDataFromSheets();
+        } else {
+            showAlert('Gagal menghubungkan. Google Script merespon: ' + (result ? result.error : ''), 'Koneksi Gagal');
+        }
+    })
+    .catch(err => {
+        hideLoadingOverlay();
+        showAlert('Gagal menghubungkan. Pastikan URL benar dan Google Script dideploy sebagai "Anyone".\n\nDetail: ' + err.message, 'Koneksi Gagal');
+    });
+}
+
+function resetToLocalServerSettings() {
+    localStorage.removeItem('pin88_db_mode');
+    localStorage.removeItem('pin88_gas_url');
+    document.getElementById('dbModeSelect').value = 'local';
+    document.getElementById('gasSettingsFields').style.display = 'none';
+    showToast('Reset ke Server API Lokal. Silakan reload halaman.');
+    setTimeout(() => window.location.reload(), 1500);
+}
+
+function testSetupGasUrl() {
+    const gasUrl = document.getElementById('setupGasUrl').value.trim();
+    if (!gasUrl) {
+        showAlert('Silakan masukkan URL Web App Google Script!', 'Peringatan');
+        return;
+    }
+    
+    const btn = document.getElementById('btnTestSetupGasUrl');
+    btn.innerText = 'Menghubungkan...';
+    btn.disabled = true;
+    
+    fetch(gasUrl, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'initSheets' })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        return res.json();
+    })
+    .then(result => {
+        btn.innerText = 'Hubungkan ke Sheets';
+        btn.disabled = false;
+        if (result && result.success) {
+            localStorage.setItem('pin88_db_mode', 'sheets');
+            localStorage.setItem('pin88_gas_url', gasUrl);
+            showAlert('Koneksi Google Sheets berhasil! Silakan tentukan/masukkan Master Password di atas untuk masuk.', 'Sukses');
+            document.getElementById('gasConfigContainer').style.display = 'none';
+        } else {
+            showAlert('Gagal menghubungkan. Google Script merespon: ' + (result ? result.error : ''), 'Koneksi Gagal');
+        }
+    })
+    .catch(err => {
+        btn.innerText = 'Hubungkan ke Sheets';
+        btn.disabled = false;
+        showAlert('Gagal menghubungkan. Pastikan URL benar dan Google Script dideploy sebagai "Anyone".\n\nDetail: ' + err.message, 'Koneksi Gagal');
+    });
+}
+
 // Initial Checks
 window.addEventListener('DOMContentLoaded', async () => {
     if (typeof CryptoJS === 'undefined') {
         showAlert("PERINGATAN: Library keamanan CryptoJS gagal dimuat secara lokal. Pastikan file 'crypto-js.min.js' ada di folder yang sama dengan 'index.html'.", "Peringatan Sistem");
     }
-    await syncFromServer();
+    
+    // Auto-detect Vercel/Cloud Deployment
+    const isCloud = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    if (isCloud && !localStorage.getItem('pin88_db_mode')) {
+        localStorage.setItem('pin88_db_mode', 'sheets');
+    }
+    
+    const dbMode = getDbMode();
+    const gasUrl = localStorage.getItem('pin88_gas_url');
+    
+    // Setup UI for Settings
+    const modeSelect = document.getElementById('dbModeSelect');
+    if (modeSelect) {
+        modeSelect.value = dbMode;
+        toggleDbModeSettings();
+    }
+    
+    if (dbMode === 'sheets') {
+        if (!gasUrl) {
+            // Show configuration setup on login screen
+            const setupDiv = document.getElementById('gasConfigContainer');
+            if (setupDiv) setupDiv.style.display = 'block';
+        }
+    } else {
+        // Only sync from Express API if we are in local server mode
+        await syncFromServer();
+    }
+    
     checkPasswordStatus();
     
     // Auto-format nominal inputs with dots
@@ -63,6 +250,11 @@ function handleAuth(event) {
     const hash = localStorage.getItem('pin88_password_hash');
     const errorDiv = document.getElementById('authError');
     
+    if (getDbMode() === 'sheets' && !localStorage.getItem('pin88_gas_url')) {
+        showAlert('Silakan hubungkan database Google Sheets Anda terlebih dahulu sebelum masuk!', 'Peringatan');
+        return;
+    }
+    
     if (typeof CryptoJS === 'undefined') {
         showAlert("Library enkripsi CryptoJS tidak ditemukan. Hubungi developer atau download kembali file 'crypto-js.min.js'.", "Kesalahan Sistem");
         return;
@@ -75,8 +267,10 @@ function handleAuth(event) {
             localStorage.setItem('pin88_password_hash', newHash);
             masterKey = passwordInput;
             
-            // Initialize empty encrypted DB structure
-            saveDatabaseToStorage();
+            if (getDbMode() !== 'sheets') {
+                // Initialize empty encrypted DB structure for local server
+                saveDatabaseToStorage();
+            }
             
             loginSuccess();
         } else {
@@ -86,12 +280,16 @@ function handleAuth(event) {
                 masterKey = passwordInput;
                 errorDiv.style.display = 'none';
                 
-                // Load and decrypt database
-                if (loadDatabaseFromStorage()) {
+                if (getDbMode() === 'sheets') {
                     loginSuccess();
                 } else {
-                    errorDiv.innerText = "Gagal memproses dekripsi database. Master password mungkin salah.";
-                    errorDiv.style.display = 'block';
+                    // Load and decrypt local database
+                    if (loadDatabaseFromStorage()) {
+                        loginSuccess();
+                    } else {
+                        errorDiv.innerText = "Gagal memproses dekripsi database. Master password mungkin salah.";
+                        errorDiv.style.display = 'block';
+                    }
                 }
             } else {
                 errorDiv.innerText = "Kata sandi salah! Coba lagi.";
@@ -109,7 +307,12 @@ function loginSuccess() {
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('appScreen').style.display = 'grid';
     document.getElementById('masterPasswordInput').value = '';
-    renderApp();
+    
+    if (getDbMode() === 'sheets') {
+        loadAllDataFromSheets();
+    } else {
+        renderApp();
+    }
 }
 
 function lockApp() {
@@ -847,23 +1050,41 @@ function renderQris() {
 // Form Saves (CRUD)
 function saveMainContacts(event) {
     event.preventDefault();
-    db.mainContacts.phone = {
-        value: document.getElementById('inMainPhone').value,
-        note: document.getElementById('inMainPhoneNote').value
-    };
-    db.mainContacts.wa = {
-        value: document.getElementById('inMainWA').value,
-        note: document.getElementById('inMainWANote').value
-    };
-    db.mainContacts.tg = {
-        value: document.getElementById('inMainTG').value,
-        note: document.getElementById('inMainTGNote').value
-    };
-    db.mainContacts.tgPhone = {
-        value: document.getElementById('inMainTGPhone').value,
-        note: document.getElementById('inMainTGPhoneNote').value
+    const contactsData = {
+        phone: {
+            value: document.getElementById('inMainPhone').value,
+            note: document.getElementById('inMainPhoneNote').value
+        },
+        wa: {
+            value: document.getElementById('inMainWA').value,
+            note: document.getElementById('inMainWANote').value
+        },
+        tg: {
+            value: document.getElementById('inMainTG').value,
+            note: document.getElementById('inMainTGNote').value
+        },
+        tgPhone: {
+            value: document.getElementById('inMainTGPhone').value,
+            note: document.getElementById('inMainTGPhoneNote').value
+        }
     };
     
+    if (getDbMode() === 'sheets') {
+        showLoadingOverlay('Menyimpan kontak...');
+        callSheetsAPI('saveMainContacts', contactsData, function() {
+            hideLoadingOverlay();
+            db.mainContacts = contactsData;
+            renderApp();
+            closeModal('modalMainContacts');
+            showToast('Kontak utama berhasil diperbarui!');
+        }, function(err) {
+            hideLoadingOverlay();
+            showAlert('Gagal menyimpan ke Google Sheets: ' + err.message, 'Error');
+        });
+        return;
+    }
+    
+    db.mainContacts = contactsData;
     saveDatabaseToStorage();
     renderApp();
     closeModal('modalMainContacts');
@@ -880,6 +1101,24 @@ function saveBackupContact(event) {
         value: document.getElementById('backupContactValue').value,
         note: document.getElementById('backupContactNote').value
     };
+
+    if (getDbMode() === 'sheets') {
+        showLoadingOverlay('Menyimpan kontak cadangan...');
+        callSheetsAPI('saveBackupContact', contactData, function() {
+            hideLoadingOverlay();
+            if (!db.backupContacts) db.backupContacts = [];
+            const idx = db.backupContacts.findIndex(bc => bc.id === id);
+            if (idx > -1) db.backupContacts[idx] = contactData;
+            else db.backupContacts.push(contactData);
+            renderApp();
+            closeModal('modalAddBackupContact');
+            showToast('Kontak cadangan berhasil disimpan!');
+        }, function(err) {
+            hideLoadingOverlay();
+            showAlert('Gagal menyimpan: ' + err.message, 'Error');
+        });
+        return;
+    }
 
     if (!db.backupContacts) {
         db.backupContacts = [];
@@ -914,6 +1153,19 @@ function editBackupContact(id) {
 
 async function deleteBackupContact(id) {
     if (await showConfirm('Apakah Anda yakin ingin menghapus kontak cadangan ini?')) {
+        if (getDbMode() === 'sheets') {
+            showLoadingOverlay('Menghapus kontak cadangan...');
+            callSheetsAPI('deleteBackupContact', id, function() {
+                hideLoadingOverlay();
+                db.backupContacts = db.backupContacts.filter(item => item.id !== id);
+                renderApp();
+                showToast('Kontak cadangan berhasil dihapus.');
+            }, function(err) {
+                hideLoadingOverlay();
+                showAlert('Gagal menghapus: ' + err.message, 'Error');
+            });
+            return;
+        }
         db.backupContacts = db.backupContacts.filter(item => item.id !== id);
         saveDatabaseToStorage();
         renderApp();
@@ -939,6 +1191,23 @@ function saveBank(event) {
         note: document.getElementById('bankNote').value
     };
 
+    if (getDbMode() === 'sheets') {
+        showLoadingOverlay('Menyimpan data bank...');
+        callSheetsAPI('saveBank', bankData, function() {
+            hideLoadingOverlay();
+            const idx = db.banks.findIndex(b => b.id === id);
+            if (idx > -1) db.banks[idx] = bankData;
+            else db.banks.push(bankData);
+            renderApp();
+            closeModal('modalAddBank');
+            showToast('Data bank berhasil disimpan!');
+        }, function(err) {
+            hideLoadingOverlay();
+            showAlert('Gagal menyimpan: ' + err.message, 'Error');
+        });
+        return;
+    }
+
     const existingIndex = db.banks.findIndex(b => b.id === id);
     if (existingIndex > -1) {
         db.banks[existingIndex] = bankData;
@@ -963,6 +1232,23 @@ function saveSocial(event) {
         note: document.getElementById('socialNote').value
     };
 
+    if (getDbMode() === 'sheets') {
+        showLoadingOverlay('Menyimpan akses sosmed...');
+        callSheetsAPI('saveSocial', socData, function() {
+            hideLoadingOverlay();
+            const idx = db.socials.findIndex(s => s.id === id);
+            if (idx > -1) db.socials[idx] = socData;
+            else db.socials.push(socData);
+            renderApp();
+            closeModal('modalAddSocial');
+            showToast('Akses sosmed berhasil disimpan!');
+        }, function(err) {
+            hideLoadingOverlay();
+            showAlert('Gagal menyimpan: ' + err.message, 'Error');
+        });
+        return;
+    }
+
     const existingIndex = db.socials.findIndex(s => s.id === id);
     if (existingIndex > -1) {
         db.socials[existingIndex] = socData;
@@ -986,6 +1272,23 @@ function saveQris(event) {
         password: document.getElementById('qrisPassword').value,
         note: document.getElementById('qrisNote').value
     };
+
+    if (getDbMode() === 'sheets') {
+        showLoadingOverlay('Menyimpan kredensial QRIS...');
+        callSheetsAPI('saveQris', qData, function() {
+            hideLoadingOverlay();
+            const idx = db.qris.findIndex(q => q.id === id);
+            if (idx > -1) db.qris[idx] = qData;
+            else db.qris.push(qData);
+            renderApp();
+            closeModal('modalAddQris');
+            showToast('Kredensial QRIS berhasil disimpan!');
+        }, function(err) {
+            hideLoadingOverlay();
+            showAlert('Gagal menyimpan: ' + err.message, 'Error');
+        });
+        return;
+    }
 
     const existingIndex = db.qris.findIndex(q => q.id === id);
     if (existingIndex > -1) {
@@ -1025,6 +1328,19 @@ function editBank(id) {
 
 async function deleteBank(id) {
     if (await showConfirm('Apakah Anda yakin ingin menghapus data bank ini?')) {
+        if (getDbMode() === 'sheets') {
+            showLoadingOverlay('Menghapus data bank...');
+            callSheetsAPI('deleteBank', id, function() {
+                hideLoadingOverlay();
+                db.banks = db.banks.filter(b => b.id !== id);
+                renderApp();
+                showToast('Data bank berhasil dihapus.');
+            }, function(err) {
+                hideLoadingOverlay();
+                showAlert('Gagal menghapus: ' + err.message, 'Error');
+            });
+            return;
+        }
         db.banks = db.banks.filter(b => b.id !== id);
         saveDatabaseToStorage();
         renderApp();
@@ -1049,6 +1365,19 @@ function editSocial(id) {
 
 async function deleteSocial(id) {
     if (await showConfirm('Apakah Anda yakin ingin menghapus data akses sosmed ini?')) {
+        if (getDbMode() === 'sheets') {
+            showLoadingOverlay('Menghapus akses sosmed...');
+            callSheetsAPI('deleteSocial', id, function() {
+                hideLoadingOverlay();
+                db.socials = db.socials.filter(s => s.id !== id);
+                renderApp();
+                showToast('Akses sosmed berhasil dihapus.');
+            }, function(err) {
+                hideLoadingOverlay();
+                showAlert('Gagal menghapus: ' + err.message, 'Error');
+            });
+            return;
+        }
         db.socials = db.socials.filter(s => s.id !== id);
         saveDatabaseToStorage();
         renderApp();
@@ -1073,6 +1402,19 @@ function editQris(id) {
 
 async function deleteQris(id) {
     if (await showConfirm('Apakah Anda yakin ingin menghapus data QRIS/akses ini?')) {
+        if (getDbMode() === 'sheets') {
+            showLoadingOverlay('Menghapus kredensial QRIS...');
+            callSheetsAPI('deleteQris', id, function() {
+                hideLoadingOverlay();
+                db.qris = db.qris.filter(q => q.id !== id);
+                renderApp();
+                showToast('Data QRIS/akses berhasil dihapus.');
+            }, function(err) {
+                hideLoadingOverlay();
+                showAlert('Gagal menghapus: ' + err.message, 'Error');
+            });
+            return;
+        }
         db.qris = db.qris.filter(q => q.id !== id);
         saveDatabaseToStorage();
         renderApp();
@@ -1106,6 +1448,24 @@ function changeMasterPassword(event) {
 
 async function clearAllData() {
     if (await showConfirm('PERINGATAN: Seluruh data penting PIN88 akan dihapus secara permanen. Apakah Anda yakin?', 'Hapus Semua Data')) {
+        if (getDbMode() === 'sheets') {
+            showLoadingOverlay('Menghapus seluruh data dari Google Sheets...');
+            callSheetsAPI('clearAllData', null, function() {
+                hideLoadingOverlay();
+                localStorage.clear();
+                db = {
+                    mainContacts: { phone: { value: "", note: "" }, wa: { value: "", note: "" }, tg: { value: "", note: "" }, tgPhone: { value: "", note: "" } },
+                    backupContacts: [], banks: [], socials: [], qris: [], pulsa: []
+                };
+                masterKey = "";
+                showAlert('Seluruh data berhasil dihapus.', 'Informasi').then(() => window.location.reload());
+            }, function(err) {
+                hideLoadingOverlay();
+                showAlert('Gagal menghapus data dari Sheets: ' + err.message, 'Error');
+            });
+            return;
+        }
+        
         localStorage.clear();
         db = {
             mainContacts: {
@@ -1138,6 +1498,24 @@ function savePulsa(event) {
         difference: document.getElementById('pulsaDifference').value,
         note: document.getElementById('pulsaNote').value
     };
+
+    if (getDbMode() === 'sheets') {
+        showLoadingOverlay('Menyimpan data pulsa...');
+        callSheetsAPI('savePulsa', pulsaData, function() {
+            hideLoadingOverlay();
+            if (!db.pulsa) db.pulsa = [];
+            const idx = db.pulsa.findIndex(p => p.id === id);
+            if (idx > -1) db.pulsa[idx] = pulsaData;
+            else db.pulsa.push(pulsaData);
+            renderApp();
+            closeModal('modalAddPulsa');
+            showToast('Data pulsa berhasil disimpan!');
+        }, function(err) {
+            hideLoadingOverlay();
+            showAlert('Gagal menyimpan: ' + err.message, 'Error');
+        });
+        return;
+    }
 
     if (!db.pulsa) {
         db.pulsa = [];
@@ -1174,6 +1552,19 @@ function editPulsa(id) {
 
 async function deletePulsa(id) {
     if (await showConfirm('Apakah Anda yakin ingin menghapus data pulsa ini?')) {
+        if (getDbMode() === 'sheets') {
+            showLoadingOverlay('Menghapus data pulsa...');
+            callSheetsAPI('deletePulsa', id, function() {
+                hideLoadingOverlay();
+                db.pulsa = db.pulsa.filter(p => p.id !== id);
+                renderApp();
+                showToast('Data pulsa berhasil dihapus.');
+            }, function(err) {
+                hideLoadingOverlay();
+                showAlert('Gagal menghapus: ' + err.message, 'Error');
+            });
+            return;
+        }
         db.pulsa = db.pulsa.filter(p => p.id !== id);
         saveDatabaseToStorage();
         renderApp();
