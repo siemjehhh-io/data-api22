@@ -365,16 +365,20 @@ function saveDatabaseToStorage() {
             banks: db.banks.map(bank => ({
                 id: bank.id,
                 name: encrypt(bank.name),
-                type: encrypt(bank.type || "custom"),
                 category: encrypt(bank.category || "dp"),
                 accountNo: encrypt(bank.accountNo),
                 accountName: encrypt(bank.accountName),
-                url: encrypt(bank.url),
-                user: encrypt(bank.user),
-                corpId: encrypt(bank.corpId || ""),
-                password: encrypt(bank.password),
-                pin: encrypt(bank.pin || ""),
-                note: encrypt(bank.note)
+                note: encrypt(bank.note || ""),
+                accesses: (bank.accesses || []).map(acc => ({
+                    id: acc.id,
+                    type: encrypt(acc.type || "custom"),
+                    url: encrypt(acc.url || ""),
+                    user: encrypt(acc.user || ""),
+                    corpId: encrypt(acc.corpId || ""),
+                    password: encrypt(acc.password || ""),
+                    pin: encrypt(acc.pin || ""),
+                    note: encrypt(acc.note || "")
+                }))
             })),
             socials: db.socials.map(soc => ({
                 id: soc.id,
@@ -423,6 +427,59 @@ function saveDatabaseToStorage() {
         console.error("Error saving database:", e);
         return false;
     }
+}
+
+function migrateDatabaseSchema() {
+    if (db.banks && db.banks.length > 0) {
+        const isFlat = db.banks.some(b => !Array.isArray(b.accesses));
+        if (isFlat) {
+            console.log("Migrating database banks schema to nested accesses format...");
+            const grouped = {};
+            db.banks.forEach(b => {
+                if (Array.isArray(b.accesses)) {
+                    const key = `${(b.name || '').trim().toLowerCase()}_${(b.accountNo || '').trim()}_${b.category || 'dp'}`;
+                    if (!grouped[key]) {
+                        grouped[key] = b;
+                    } else {
+                        grouped[key].accesses = grouped[key].accesses.concat(b.accesses);
+                    }
+                } else {
+                    const name = (b.name || '').trim();
+                    const accNo = (b.accountNo || '').trim();
+                    const category = b.category || 'dp';
+                    const accName = b.accountName || '';
+                    const note = b.note || '';
+
+                    const key = `${name.toLowerCase()}_${accNo}_${category}`;
+                    if (!grouped[key]) {
+                        grouped[key] = {
+                            id: 'bank_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                            name: name,
+                            category: category,
+                            accountNo: accNo,
+                            accountName: accName,
+                            note: note,
+                            accesses: []
+                        };
+                    }
+                    
+                    grouped[key].accesses.push({
+                        id: b.id || 'access_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        type: b.type || 'custom',
+                        url: b.url || '',
+                        user: b.user || '',
+                        corpId: b.corpId || '',
+                        password: b.password || '',
+                        pin: b.pin || '',
+                        note: b.note || ''
+                    });
+                }
+            });
+            db.banks = Object.values(grouped);
+            return true;
+        }
+    }
+    return false;
 }
 
 function loadDatabaseFromStorage() {
@@ -497,20 +554,53 @@ function loadDatabaseFromStorage() {
         }
         
         // Decrypt banks
-        db.banks = (encryptedDb.banks || []).map(bank => ({
-            id: bank.id,
-            name: decrypt(bank.name),
-            type: decrypt(bank.type) || "custom",
-            category: decrypt(bank.category) || "dp",
-            accountNo: decrypt(bank.accountNo),
-            accountName: decrypt(bank.accountName),
-            url: decrypt(bank.url),
-            user: decrypt(bank.user),
-            corpId: decrypt(bank.corpId || ""),
-            password: decrypt(bank.password),
-            pin: decrypt(bank.pin || ""),
-            note: decrypt(bank.note)
-        }));
+        db.banks = (encryptedDb.banks || []).map(bank => {
+            if (Array.isArray(bank.accesses)) {
+                return {
+                    id: bank.id,
+                    name: decrypt(bank.name),
+                    category: decrypt(bank.category) || "dp",
+                    accountNo: decrypt(bank.accountNo),
+                    accountName: decrypt(bank.accountName),
+                    note: decrypt(bank.note || ""),
+                    accesses: bank.accesses.map(acc => ({
+                        id: acc.id,
+                        type: decrypt(acc.type) || "custom",
+                        url: decrypt(acc.url || ""),
+                        user: decrypt(acc.user || ""),
+                        corpId: decrypt(acc.corpId || ""),
+                        password: decrypt(acc.password || ""),
+                        pin: decrypt(acc.pin || ""),
+                        note: decrypt(acc.note || "")
+                    }))
+                };
+            } else {
+                return {
+                    id: bank.id,
+                    name: decrypt(bank.name),
+                    type: decrypt(bank.type) || "custom",
+                    category: decrypt(bank.category) || "dp",
+                    accountNo: decrypt(bank.accountNo),
+                    accountName: decrypt(bank.accountName),
+                    url: decrypt(bank.url),
+                    user: decrypt(bank.user),
+                    corpId: decrypt(bank.corpId || ""),
+                    password: decrypt(bank.password),
+                    pin: decrypt(bank.pin || ""),
+                    note: decrypt(bank.note || "")
+                };
+            }
+        });
+
+        // Trigger migration if there are flat bank entries
+        const hasFlat = db.banks.some(b => !Array.isArray(b.accesses));
+        if (hasFlat) {
+            migrateDatabaseSchema();
+            // Save the migrated structure to storage
+            setTimeout(() => {
+                saveDatabaseToStorage();
+            }, 100);
+        }
         
         // Decrypt socials
         db.socials = (encryptedDb.socials || []).map(soc => ({
@@ -805,7 +895,6 @@ function renderBanks() {
     }
     
     filteredBanks.forEach(bank => {
-        const typeLabel = bankTypeLabels[bank.type || 'custom'] || 'Kustom';
         const nameLower = (bank.name || '').toLowerCase();
         let bankClass = '';
         if (nameLower.includes('bca')) {
@@ -820,22 +909,19 @@ function renderBanks() {
         
         const card = document.createElement('div');
         card.className = `data-card bank ${bankClass}`;
+        card.id = `bank-card-${bank.id}`;
         
         let fieldsHtml = `
             <div class="data-card-header">
                 <div class="data-card-title">
                     ${escapeHTML(bank.name)} 
-                    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary); opacity: 0.8;">(${escapeHTML(typeLabel)})</span>
                     <span class="category-tag ${bank.category || 'dp'}">${(bank.category || 'dp').toUpperCase()}</span>
                 </div>
                 <div class="data-card-actions">
-                    <button class="action-btn copy-all" onclick="copyAllBankData('${bank.id}')" title="Salin Semua Data (Chat)">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                    </button>
-                    <button class="action-btn edit" onclick="editBank('${bank.id}')" title="Edit">
+                    <button class="action-btn edit" onclick="editBank('${bank.id}')" title="Edit Rekening">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                     </button>
-                    <button class="action-btn delete" onclick="deleteBank('${bank.id}')" title="Hapus">
+                    <button class="action-btn delete" onclick="deleteBank('${bank.id}')" title="Hapus Rekening">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                 </div>
@@ -845,6 +931,9 @@ function renderBanks() {
                     <span class="data-field-label">No. Rekening</span>
                     <span class="data-field-value">${escapeHTML(bank.accountNo)}</span>
                 </div>
+                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(bank.accountNo)}')" title="Salin Rekening">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                </button>
             </div>
             <div class="data-field">
                 <div class="data-field-info">
@@ -854,76 +943,121 @@ function renderBanks() {
             </div>
         `;
 
-        // Username (only if filled)
-        if (bank.user) {
-            fieldsHtml += `
-                <div class="data-field">
-                    <div class="data-field-info">
-                        <span class="data-field-label">Username Login</span>
-                        <span class="data-field-value">${escapeHTML(bank.user)}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Corporate ID (only if filled)
-        if (bank.corpId) {
-            fieldsHtml += `
-                <div class="data-field">
-                    <div class="data-field-info">
-                        <span class="data-field-label">Corporate ID</span>
-                        <span class="data-field-value">${escapeHTML(bank.corpId)}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Password (only if filled)
-        if (bank.password) {
-            fieldsHtml += `
-                <div class="data-field">
-                    <div class="data-field-info">
-                        <span class="data-field-label">Password Login</span>
-                        <span class="data-field-value">${escapeHTML(bank.password)}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        // PIN (only if filled)
-        if (bank.pin) {
-            fieldsHtml += `
-                <div class="data-field">
-                    <div class="data-field-info">
-                        <span class="data-field-label">PIN Transaksi / Login</span>
-                        <span class="data-field-value">${escapeHTML(bank.pin)}</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        if (bank.url) {
-            fieldsHtml += `
-                <div style="margin-top: 15px; display: flex; gap: 10px; width: 100%;">
-                    <a href="${escapeHTML(bank.url)}" target="_blank" class="btn-secondary" style="flex-grow: 1; font-size: 0.85rem; padding: 10px 12px; justify-content: center; margin: 0; display: flex; align-items: center; gap: 8px; text-decoration: none;">
-                        Buka Link e-Banking
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                    </a>
-                    <button class="btn-secondary" onclick="copyRawText('${escapeJSVal(bank.url)}')" title="Salin Link e-Banking" style="flex-shrink: 0; padding: 10px 14px; justify-content: center; margin: 0; display: flex; align-items: center;">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                    </button>
-                </div>
-            `;
-        }
-
         if (bank.note) {
             fieldsHtml += `
-                <div style="margin-top: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary);">
-                    <strong>Catatan:</strong> ${escapeHTML(bank.note)}
+                <div style="margin-top: 10px; margin-bottom: 12px; font-size: 0.8rem; background: rgba(0,0,0,0.03); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                    <strong>Catatan Rekening:</strong> ${escapeHTML(bank.note)}
                 </div>
             `;
         }
 
+        // Render Accesses
+        const accesses = bank.accesses || [];
+        if (accesses.length > 0) {
+            fieldsHtml += `
+                <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Akses E-Banking</div>
+                    <div class="bank-access-tabs" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px;">
+            `;
+            
+            accesses.forEach((acc, aIdx) => {
+                const typeLabel = bankTypeLabels[acc.type || 'custom'] || 'Kustom';
+                fieldsHtml += `
+                    <button class="bank-access-tab ${aIdx === 0 ? 'active' : ''}" data-access-id="${acc.id}" onclick="switchBankAccessTab('${bank.id}', '${acc.id}')" style="flex-shrink: 0; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: var(--transition);">
+                        ${escapeHTML(typeLabel)}
+                    </button>
+                `;
+            });
+            
+            fieldsHtml += `
+                    </div>
+                </div>
+                <div class="bank-access-panels" style="margin-top: 10px;">
+            `;
+            
+            accesses.forEach((acc, aIdx) => {
+                const typeLabel = bankTypeLabels[acc.type || 'custom'] || 'Kustom';
+                const isBca = nameLower.includes('bca') || acc.type.toLowerCase().includes('bca');
+                const passLabel = isBca ? 'KeyBCA / Password' : 'Password Login';
+                const isActive = aIdx === 0;
+                
+                fieldsHtml += `
+                    <div class="bank-access-panel ${isActive ? 'active' : ''}" id="panel-${bank.id}-${acc.id}" style="${isActive ? 'display: block;' : 'display: none;'}">
+                        ${acc.user ? `
+                            <div class="data-field" style="margin-bottom: 8px;">
+                                <div class="data-field-info">
+                                    <span class="data-field-label">Username Login</span>
+                                    <span class="data-field-value">${escapeHTML(acc.user)}</span>
+                                </div>
+                                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.user)}')" title="Salin Username">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        ${acc.corpId ? `
+                            <div class="data-field" style="margin-bottom: 8px;">
+                                <div class="data-field-info">
+                                    <span class="data-field-label">Corporate ID</span>
+                                    <span class="data-field-value">${escapeHTML(acc.corpId)}</span>
+                                </div>
+                                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.corpId)}')" title="Salin Corporate ID">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        ${acc.password ? `
+                            <div class="data-field" style="margin-bottom: 8px;">
+                                <div class="data-field-info">
+                                    <span class="data-field-label">${passLabel}</span>
+                                    <span class="data-field-value">${escapeHTML(acc.password)}</span>
+                                </div>
+                                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.password)}')" title="Salin Password">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        ${acc.pin ? `
+                            <div class="data-field" style="margin-bottom: 8px;">
+                                <div class="data-field-info">
+                                    <span class="data-field-label">PIN Transaksi / Login</span>
+                                    <span class="data-field-value">${escapeHTML(acc.pin)}</span>
+                                </div>
+                                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.pin)}')" title="Salin PIN">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        ${acc.note ? `
+                            <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8rem; background: rgba(0,0,0,0.03); padding: 8px; border-radius: var(--radius-sm); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                                <strong>Keterangan Akses:</strong> ${escapeHTML(acc.note)}
+                            </div>
+                        ` : ''}
+                        
+                        <div style="margin-top: 12px; display: flex; gap: 10px; width: 100%;">
+                            ${acc.url ? `
+                                <a href="${escapeHTML(acc.url)}" target="_blank" class="btn-secondary" style="flex: 1; font-size: 0.8rem; padding: 10px; justify-content: center; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                    Buka Link
+                                </a>
+                            ` : ''}
+                            <button class="btn-secondary" onclick="copyAllAccessData('${bank.id}', '${acc.id}')" style="flex: 1; font-size: 0.8rem; padding: 10px; justify-content: center; gap: 6px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                Salin Data Chat
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            fieldsHtml += `
+                </div>
+            `;
+        }
+        
         card.innerHTML = fieldsHtml;
         container.appendChild(card);
     });
@@ -1182,19 +1316,34 @@ async function deleteBackupContact(id) {
 function saveBank(event) {
     event.preventDefault();
     const id = document.getElementById('bankId').value || 'bank_' + Date.now();
+    
+    const accesses = [];
+    const container = document.getElementById('formAccessesContainer');
+    if (container) {
+        const rows = container.querySelectorAll('.access-form-row');
+        rows.forEach(row => {
+            const accId = row.id.replace('accessRow_', 'access_') || 'access_' + Math.random().toString(36).substr(2, 9);
+            accesses.push({
+                id: accId,
+                type: row.querySelector('.access-type-select').value,
+                user: row.querySelector('.access-user').value,
+                password: row.querySelector('.access-pass').value,
+                pin: row.querySelector('.access-pin').value,
+                corpId: row.querySelector('.access-corpid').value,
+                url: row.querySelector('.access-url').value,
+                note: row.querySelector('.access-note').value
+            });
+        });
+    }
+
     const bankData = {
         id: id,
         name: document.getElementById('bankName').value,
-        type: document.getElementById('bankType').value,
         category: document.getElementById('bankCategory').value,
         accountNo: document.getElementById('bankAccountNo').value,
         accountName: document.getElementById('bankAccountName').value,
-        url: document.getElementById('bankUrl').value,
-        user: document.getElementById('bankUser').value,
-        corpId: document.getElementById('bankCorpId').value,
-        password: document.getElementById('bankPassword').value,
-        pin: document.getElementById('bankPin').value,
-        note: document.getElementById('bankNote').value
+        note: document.getElementById('bankNote').value,
+        accesses: accesses
     };
 
     if (getDbMode() === 'sheets') {
@@ -1315,18 +1464,22 @@ function editBank(id) {
     
     document.getElementById('bankId').value = bank.id;
     document.getElementById('bankName').value = bank.name;
-    document.getElementById('bankType').value = bank.type || 'custom';
     document.getElementById('bankCategory').value = bank.category || 'dp';
     document.getElementById('bankAccountNo').value = bank.accountNo;
     document.getElementById('bankAccountName').value = bank.accountName;
-    document.getElementById('bankUrl').value = bank.url;
-    document.getElementById('bankUser').value = bank.user || '';
-    document.getElementById('bankCorpId').value = bank.corpId || '';
-    document.getElementById('bankPassword').value = bank.password || '';
-    document.getElementById('bankPin').value = bank.pin || '';
-    document.getElementById('bankNote').value = bank.note;
+    document.getElementById('bankNote').value = bank.note || '';
     
-    adjustBankFields();
+    const container = document.getElementById('formAccessesContainer');
+    if (container) {
+        container.innerHTML = '';
+        if (bank.accesses && bank.accesses.length > 0) {
+            bank.accesses.forEach(acc => {
+                addAccessFieldToForm(acc);
+            });
+        } else {
+            addAccessFieldToForm();
+        }
+    }
     
     document.getElementById('bankModalTitle').innerText = 'Edit Rekening Bank';
     openModal('modalAddBank');
@@ -1656,39 +1809,136 @@ function switchBankFilter(filterVal) {
     renderBanks();
 }
 
-function adjustBankFields() {
-    const type = document.getElementById('bankType').value;
-    const userGroup = document.querySelector('.field-bank-user');
-    const corpIdGroup = document.querySelector('.field-bank-corpid');
-    const passwordGroup = document.querySelector('.field-bank-password');
-    const pinGroup = document.querySelector('.field-bank-pin');
+function addAccessFieldToForm(data = null) {
+    const container = document.getElementById('formAccessesContainer');
+    if (!container) return;
+    
+    const rowId = 'accessRow_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    const type = data ? data.type : 'custom';
+    const user = data ? data.user : '';
+    const pass = data ? data.password : '';
+    const pin = data ? data.pin : '';
+    const corpId = data ? data.corpId : '';
+    const url = data ? data.url : '';
+    const note = data ? data.note : '';
+    
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'access-form-row';
+    rowDiv.id = rowId;
+    rowDiv.style.border = '1px solid var(--border-color)';
+    rowDiv.style.padding = '15px';
+    rowDiv.style.borderRadius = 'var(--radius-md)';
+    rowDiv.style.marginBottom = '15px';
+    rowDiv.style.position = 'relative';
+    rowDiv.style.background = 'var(--bg-secondary)';
+    
+    rowDiv.innerHTML = `
+        <button type="button" onclick="document.getElementById('${rowId}').remove()" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: var(--accent-red); font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0 5px;">&times;</button>
+        <div class="form-group" style="margin-bottom: 12px; padding-right: 20px;">
+            <label style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px;">Tipe Layanan / Akses</label>
+            <select class="form-control access-type-select" style="padding: 8px 12px; font-size: 0.9rem;" onchange="adjustAccessRowFields('${rowId}')">
+                <option value="custom" ${type === 'custom' ? 'selected' : ''}>Kustom / Lainnya</option>
+                <option value="klik_bca" ${type === 'klik_bca' ? 'selected' : ''}>Klik BCA</option>
+                <option value="mbanking_bca" ${type === 'mbanking_bca' ? 'selected' : ''}>M-Banking BCA</option>
+                <option value="mybca" ${type === 'mybca' ? 'selected' : ''}>MyBCA</option>
+                <option value="ebanking_bni" ${type === 'ebanking_bni' ? 'selected' : ''}>E-Banking BNI</option>
+                <option value="mbanking_bni" ${type === 'mbanking_bni' ? 'selected' : ''}>M-Banking BNI</option>
+                <option value="bni_wondr" ${type === 'bni_wondr' ? 'selected' : ''}>BNI Wondr</option>
+                <option value="qlola_bri" ${type === 'qlola_bri' ? 'selected' : ''}>Qlola BRI</option>
+                <option value="mbanking_bri" ${type === 'mbanking_bri' ? 'selected' : ''}>M-Banking BRI</option>
+            </select>
+        </div>
+        <div class="form-row fields-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div class="form-group" style="margin-bottom: 0;" id="user-group-${rowId}">
+                <label style="font-size: 0.8rem; margin-bottom: 4px;">Username</label>
+                <input type="text" class="form-control access-user" value="${escapeHTML(user)}" style="padding: 8px 12px; font-size: 0.9rem;">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;" id="pass-group-${rowId}">
+                <label style="font-size: 0.8rem; margin-bottom: 4px;">Password</label>
+                <input type="text" class="form-control access-pass" value="${escapeHTML(pass)}" style="padding: 8px 12px; font-size: 0.9rem;">
+            </div>
+        </div>
+        <div class="form-row fields-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div class="form-group" style="margin-bottom: 0;" id="pin-group-${rowId}">
+                <label style="font-size: 0.8rem; margin-bottom: 4px;">PIN</label>
+                <input type="text" class="form-control access-pin" value="${escapeHTML(pin)}" style="padding: 8px 12px; font-size: 0.9rem;">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;" id="corp-group-${rowId}">
+                <label style="font-size: 0.8rem; margin-bottom: 4px;">Corporate ID</label>
+                <input type="text" class="form-control access-corpid" value="${escapeHTML(corpId)}" style="padding: 8px 12px; font-size: 0.9rem;">
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 10px;" id="url-group-${rowId}">
+            <label style="font-size: 0.8rem; margin-bottom: 4px;">Link URL Login</label>
+            <input type="url" class="form-control access-url" value="${escapeHTML(url)}" style="padding: 8px 12px; font-size: 0.9rem;" placeholder="https://...">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.8rem; margin-bottom: 4px;">Catatan Akses</label>
+            <input type="text" class="form-control access-note" value="${escapeHTML(note)}" style="padding: 8px 12px; font-size: 0.9rem;" placeholder="Pertanyaan keamanan, token info, dll...">
+        </div>
+    `;
+    
+    container.appendChild(rowDiv);
+    adjustAccessRowFields(rowId);
+}
 
-    // Default: Tampilkan semua
+function adjustAccessRowFields(rowId) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    
+    const type = row.querySelector('.access-type-select').value;
+    const userGroup = row.querySelector(`#user-group-${rowId}`);
+    const passGroup = row.querySelector(`#pass-group-${rowId}`);
+    const pinGroup = row.querySelector(`#pin-group-${rowId}`);
+    const corpGroup = row.querySelector(`#corp-group-${rowId}`);
+    const urlGroup = row.querySelector(`#url-group-${rowId}`);
+    
     userGroup.style.display = 'block';
-    corpIdGroup.style.display = 'block';
-    passwordGroup.style.display = 'block';
+    passGroup.style.display = 'block';
     pinGroup.style.display = 'block';
+    corpGroup.style.display = 'block';
+    urlGroup.style.display = 'block';
+    
+    const passLabel = row.querySelector(`#pass-group-${rowId} label`);
+    if (passLabel) passLabel.innerText = 'Password';
 
     if (type === 'klik_bca') {
-        corpIdGroup.style.display = 'none';
+        corpGroup.style.display = 'none';
         pinGroup.style.display = 'none';
+        row.querySelector('.access-url').value = row.querySelector('.access-url').value || 'https://ibank.klikbca.com';
     } else if (type === 'mbanking_bca') {
-        userGroup.style.display = 'none';
-        corpIdGroup.style.display = 'none';
-    } else if (type === 'mybca' || type === 'ebanking_bni' || type === 'mbanking_bni' || type === 'bni_wondr' || type === 'mbanking_bri') {
-        corpIdGroup.style.display = 'none';
+        corpGroup.style.display = 'none';
+        passGroup.style.display = 'none';
+        urlGroup.style.display = 'none';
+    } else if (type === 'mybca') {
+        corpGroup.style.display = 'none';
+        row.querySelector('.access-url').value = row.querySelector('.access-url').value || 'https://mybca.bca.co.id';
+    } else if (type === 'ebanking_bni') {
+        corpGroup.style.display = 'none';
+        pinGroup.style.display = 'none';
+        row.querySelector('.access-url').value = row.querySelector('.access-url').value || 'https://ibank.bni.co.id';
+    } else if (type === 'mbanking_bni' || type === 'bni_wondr') {
+        corpGroup.style.display = 'none';
+        urlGroup.style.display = 'none';
     } else if (type === 'qlola_bri') {
         pinGroup.style.display = 'none';
+        row.querySelector('.access-url').value = row.querySelector('.access-url').value || 'https://qlola.bri.co.id';
+    } else if (type === 'mbanking_bri') {
+        corpGroup.style.display = 'none';
+        urlGroup.style.display = 'none';
     }
 }
 
 function openModal(modalId) {
-    // Reset forms when adding new
     if (modalId === 'modalAddBank' && !document.getElementById('bankId').value) {
         document.getElementById('bankForm').reset();
         document.getElementById('bankModalTitle').innerText = 'Tambah Rekening Bank';
-        document.getElementById('bankType').value = 'custom';
-        adjustBankFields();
+        const container = document.getElementById('formAccessesContainer');
+        if (container) {
+            container.innerHTML = '';
+            addAccessFieldToForm();
+        }
     }
     if (modalId === 'modalAddSocial' && !document.getElementById('socialId').value) {
         document.getElementById('socialForm').reset();
@@ -1765,50 +2015,65 @@ function copyRawText(val) {
     });
 }
 
-function copyAllBankData(bankId) {
+function switchBankAccessTab(bankId, accessId) {
+    const card = document.getElementById(`bank-card-${bankId}`);
+    if (!card) return;
+    
+    // Deactivate tabs
+    card.querySelectorAll('.bank-access-tab').forEach(tab => tab.classList.remove('active'));
+    // Hide panels
+    card.querySelectorAll('.bank-access-panel').forEach(panel => {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+    });
+    
+    // Activate clicked tab
+    const tabEl = card.querySelector(`[data-access-id="${accessId}"]`);
+    if (tabEl) tabEl.classList.add('active');
+    
+    // Show active panel
+    const panelEl = card.querySelector(`#panel-${bankId}-${accessId}`);
+    if (panelEl) {
+        panelEl.classList.add('active');
+        panelEl.style.display = 'block';
+    }
+}
+
+function copyAllAccessData(bankId, accessId) {
     const bank = db.banks.find(b => b.id === bankId);
     if (!bank) return;
+    
+    const acc = bank.accesses.find(a => a.id === accessId);
+    if (!acc) return;
 
     const nameUpper = (bank.name || '').toUpperCase();
     const accountNameUpper = (bank.accountName || '').toUpperCase();
     const accountNo = bank.accountNo || '';
-
-    // Determine service header based on bank type
-    let serviceHeader = "INTERNET BANKING";
-    const type = bank.type || 'custom';
-    if (type === 'mbanking_bca' || type === 'mbanking_bni' || type === 'mbanking_bri') {
-        serviceHeader = "MOBILE BANKING";
-    } else if (type === 'bni_wondr') {
-        serviceHeader = "WONDR BY BNI";
-    } else if (type === 'mybca') {
-        serviceHeader = "MYBCA";
-    } else {
-        serviceHeader = "INTERNET BANKING";
-    }
+    const typeLabel = (bankTypeLabels[acc.type || 'custom'] || 'KUSTOM').toUpperCase();
 
     let text = `${accountNameUpper} - ${nameUpper} / ${accountNo}\n\n`;
-    text += `${serviceHeader}\n\n`;
+    text += `${typeLabel}\n\n`;
 
-    if (bank.corpId) {
-        text += `- CORPORATE ID : ${bank.corpId}\n`;
+    if (acc.corpId) {
+        text += `- CORPORATE ID : ${acc.corpId}\n`;
     }
-    if (bank.user) {
-        text += `- USER ID : ${bank.user}\n`;
+    if (acc.user) {
+        text += `- USER ID : ${acc.user}\n`;
     }
-    if (bank.pin) {
-        text += `- PIN : ${bank.pin}\n`;
+    if (acc.pin) {
+        text += `- PIN : ${acc.pin}\n`;
     }
-    if (bank.password) {
-        const isBca = nameUpper.includes('BCA') || type.toLowerCase().includes('bca');
+    if (acc.password) {
+        const isBca = nameUpper.includes('BCA') || acc.type.toLowerCase().includes('bca');
         const passLabel = isBca ? 'KEYBCA' : 'PASSWORD';
-        text += `- ${passLabel} : ${bank.password}\n`;
+        text += `- ${passLabel} : ${acc.password}\n`;
     }
 
     navigator.clipboard.writeText(text.trim()).then(() => {
-        showToast('Data bank berhasil disalin untuk chat!');
+        showToast('Kredensial disalin untuk chat!');
     }).catch(err => {
-        console.error('Failed to copy bank data:', err);
-        showToast('Gagal menyalin data bank.');
+        console.error('Copy failed:', err);
+        showToast('Gagal menyalin kredensial.');
     });
 }
 

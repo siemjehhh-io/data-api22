@@ -423,20 +423,6 @@
                     <input type="text" id="bankName" class="form-control" placeholder="Contoh: BCA, Mandiri, BNI" required>
                 </div>
                 <div class="form-group">
-                    <label>Tipe Layanan / Aplikasi</label>
-                    <select id="bankType" class="form-control" onchange="adjustBankFields()">
-                        <option value="custom">Kustom (Tampilkan Semua Field)</option>
-                        <option value="klik_bca">Klik BCA</option>
-                        <option value="mbanking_bca">M-Banking BCA</option>
-                        <option value="mybca">MyBCA</option>
-                        <option value="ebanking_bni">E-Banking BNI</option>
-                        <option value="mbanking_bni">M-Banking BNI</option>
-                        <option value="bni_wondr">BNI Wondr</option>
-                        <option value="qlola_bri">Qlola BRI</option>
-                        <option value="mbanking_bri">M-Banking BRI</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label>Kategori Rekening (DP/WD)</label>
                     <select id="bankCategory" class="form-control">
                         <option value="dp">BANK DP (Deposit)</option>
@@ -452,28 +438,19 @@
                     <input type="text" id="bankAccountName" class="form-control" placeholder="Atas nama rekening..." required>
                 </div>
                 <div class="form-group">
-                    <label>Link Login Internet Banking</label>
-                    <input type="url" id="bankUrl" class="form-control" placeholder="https://...">
+                    <label>Catatan Rekening (Opsional)</label>
+                    <textarea id="bankNote" class="form-control" rows="2" placeholder="Catatan umum mengenai rekening ini..."></textarea>
                 </div>
-                <div class="form-group field-bank-user">
-                    <label>Username Login</label>
-                    <input type="text" id="bankUser" class="form-control" placeholder="Username e-banking...">
-                </div>
-                <div class="form-group field-bank-corpid">
-                    <label>Corporate ID</label>
-                    <input type="text" id="bankCorpId" class="form-control" placeholder="Corporate ID...">
-                </div>
-                <div class="form-group field-bank-password">
-                    <label>Password Login / Akses</label>
-                    <input type="text" id="bankPassword" class="form-control" placeholder="Password e-banking...">
-                </div>
-                <div class="form-group field-bank-pin">
-                    <label>PIN Layanan</label>
-                    <input type="text" id="bankPin" class="form-control" placeholder="PIN transaksi / login...">
-                </div>
-                <div class="form-group">
-                    <label>Catatan Tambahan (misal: Pertanyaan Keamanan / Token Info)</label>
-                    <textarea id="bankNote" class="form-control" rows="3" placeholder="Catatan opsional..."></textarea>
+                
+                <!-- DYNAMIC ACCESS CREDENTIALS BUILDER -->
+                <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <label style="display: block; font-size: 1rem; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">Akses Kredensial Login</label>
+                    <div id="formAccessesContainer">
+                        <!-- Dynamic rows will be inserted here -->
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="addAccessFieldToForm()" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 20px; font-size: 0.9rem; padding: 12px; font-weight: 700; border-style: dashed; border-color: var(--accent-active); color: var(--accent-active);">
+                        + Tambah Akses Kredensial
+                    </button>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalAddBank')">Batal</button>

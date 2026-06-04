@@ -1189,3 +1189,63 @@ header {
     background: var(--pastel-purple);
 }
 
+/* Bank Access Tabs & Pills styling */
+.bank-access-tab {
+    transition: var(--transition);
+    outline: none;
+}
+.bank-access-tab:hover {
+    background: rgba(205, 162, 131, 0.15) !important;
+    border-color: var(--accent-active) !important;
+    color: var(--text-primary) !important;
+}
+.bank-access-tab.active {
+    background: var(--accent-active) !important;
+    border-color: var(--accent-active) !important;
+    color: #ffffff !important;
+}
+
+/* Custom coloring overrides for active tabs inside branded bank cards */
+.data-card.bank-bca .bank-access-tab:hover {
+    background: rgba(13, 56, 50, 0.15) !important;
+    border-color: #0d3832 !important;
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .bank-access-tab.active {
+    background: #0d3832 !important;
+    border-color: #0d3832 !important;
+    color: #8cd4cb !important;
+}
+
+.data-card.bank-bni .bank-access-tab:hover {
+    background: rgba(94, 35, 0, 0.15) !important;
+    border-color: #5e2300 !important;
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .bank-access-tab.active {
+    background: #5e2300 !important;
+    border-color: #5e2300 !important;
+    color: #f2a379 !important;
+}
+
+.data-card.bank-mandiri .bank-access-tab:hover {
+    background: rgba(84, 53, 7, 0.15) !important;
+    border-color: #543507 !important;
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .bank-access-tab.active {
+    background: #543507 !important;
+    border-color: #543507 !important;
+    color: #ebb976 !important;
+}
+
+/* Styling for access rows inside the modal form builder */
+.access-form-row {
+    animation: slideDown 0.3s ease;
+    transition: var(--transition);
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
