@@ -917,7 +917,7 @@ function renderBanks() {
                     ${getBankLogoHtml(bank.name)}
                     <div class="bank-title-group">
                         <span class="bank-name-title">${escapeHTML(bank.name)}</span>
-                        <span class="bank-category-subtitle">(${bank.category === 'dp' ? 'Deposit' : 'Withdrawal'})</span>
+                        <span class="bank-category-badge">${bank.category === 'dp' ? 'DEPOSIT' : 'WITHDRAWAL'}</span>
                     </div>
                 </div>
                 <div class="bank-header-right">

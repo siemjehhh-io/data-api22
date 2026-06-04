@@ -1279,28 +1279,46 @@ header {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 .bank-title-group {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 .bank-name-title {
     font-family: var(--font-heading);
-    font-size: 1.4rem;
+    font-size: 1.15rem;
     font-weight: 800;
     color: inherit;
-    line-height: 1.1;
+    line-height: 1.25;
+    word-break: break-word;
 }
-.bank-category-subtitle {
-    font-size: 0.75rem;
+.bank-category-badge {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.08);
     color: inherit;
-    opacity: 0.6;
-    font-weight: 500;
+    display: inline-block;
+    margin-top: 4px;
+    width: fit-content;
+    text-transform: uppercase;
+}
+/* Category badge for dark cards fallback */
+.data-card.bank:not(.bank-bca):not(.bank-bni):not(.bank-bri):not(.bank-mandiri) .bank-category-badge {
+    background: rgba(255, 255, 255, 0.1);
 }
 .bank-header-right {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    flex: 0 0 auto;
+    margin-left: 16px;
+    text-align: right;
 }
 .bank-acc-no-row {
     display: flex;
@@ -1308,7 +1326,7 @@ header {
     gap: 6px;
 }
 .bank-acc-no {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: inherit;
 }
@@ -1509,12 +1527,12 @@ header {
 
 /* BCA Branded Card Layout Overrides */
 .data-card.bank-bca .bank-accesses-box {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(13, 56, 50, 0.12) !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(13, 56, 50, 0.15) !important;
 }
 .data-card.bank-bca .bank-access-tabs-pill {
-    background: rgba(13, 56, 50, 0.08) !important;
-    border-color: rgba(13, 56, 50, 0.06) !important;
+    background: rgba(13, 56, 50, 0.1) !important;
+    border-color: rgba(13, 56, 50, 0.08) !important;
 }
 .data-card.bank-bca .bank-access-tab-link {
     color: #0d3832 !important;
@@ -1526,12 +1544,12 @@ header {
 .data-card.bank-bca .bank-access-tab-link.active {
     background: #0d3832 !important;
     border-color: #0d3832 !important;
-    color: #8cd4cb !important;
+    color: #ffffff !important;
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.15) !important;
 }
 .data-card.bank-bca .bank-credentials-grid {
-    background: rgba(255, 255, 255, 0.35) !important;
-    border-color: rgba(13, 56, 50, 0.12) !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(13, 56, 50, 0.15) !important;
 }
 .data-card.bank-bca .bank-cred-cell {
     border-color: rgba(13, 56, 50, 0.1) !important;
@@ -1551,29 +1569,29 @@ header {
     background: rgba(13, 56, 50, 0.08) !important;
 }
 .data-card.bank-bca .bank-pill-btn {
-    background: rgba(255, 255, 255, 0.45) !important;
-    border-color: rgba(13, 56, 50, 0.15) !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-color: rgba(13, 56, 50, 0.2) !important;
     color: #0d3832 !important;
 }
 .data-card.bank-bca .bank-pill-btn:hover {
-    background: rgba(255, 255, 255, 0.75) !important;
-    border-color: rgba(13, 56, 50, 0.25) !important;
+    background: #ffffff !important;
+    border-color: rgba(13, 56, 50, 0.3) !important;
     box-shadow: 0 4px 15px rgba(13, 56, 50, 0.1) !important;
 }
 .data-card.bank-bca .bank-note-box {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(13, 56, 50, 0.12) !important;
-    color: rgba(13, 56, 50, 0.8) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(13, 56, 50, 0.15) !important;
+    color: #0d3832 !important;
 }
 
 /* BNI Branded Card Layout Overrides */
 .data-card.bank-bni .bank-accesses-box {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(94, 35, 0, 0.12) !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(94, 35, 0, 0.15) !important;
 }
 .data-card.bank-bni .bank-access-tabs-pill {
-    background: rgba(94, 35, 0, 0.08) !important;
-    border-color: rgba(94, 35, 0, 0.06) !important;
+    background: rgba(94, 35, 0, 0.1) !important;
+    border-color: rgba(94, 35, 0, 0.08) !important;
 }
 .data-card.bank-bni .bank-access-tab-link {
     color: #5e2300 !important;
@@ -1585,12 +1603,12 @@ header {
 .data-card.bank-bni .bank-access-tab-link.active {
     background: #5e2300 !important;
     border-color: #5e2300 !important;
-    color: #f2a379 !important;
+    color: #ffffff !important;
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.15) !important;
 }
 .data-card.bank-bni .bank-credentials-grid {
-    background: rgba(255, 255, 255, 0.35) !important;
-    border-color: rgba(94, 35, 0, 0.12) !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(94, 35, 0, 0.15) !important;
 }
 .data-card.bank-bni .bank-cred-cell {
     border-color: rgba(94, 35, 0, 0.1) !important;
@@ -1610,29 +1628,29 @@ header {
     background: rgba(94, 35, 0, 0.08) !important;
 }
 .data-card.bank-bni .bank-pill-btn {
-    background: rgba(255, 255, 255, 0.45) !important;
-    border-color: rgba(94, 35, 0, 0.15) !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-color: rgba(94, 35, 0, 0.2) !important;
     color: #5e2300 !important;
 }
 .data-card.bank-bni .bank-pill-btn:hover {
-    background: rgba(255, 255, 255, 0.75) !important;
-    border-color: rgba(94, 35, 0, 0.25) !important;
+    background: #ffffff !important;
+    border-color: rgba(94, 35, 0, 0.3) !important;
     box-shadow: 0 4px 15px rgba(94, 35, 0, 0.1) !important;
 }
 .data-card.bank-bni .bank-note-box {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(94, 35, 0, 0.12) !important;
-    color: rgba(94, 35, 0, 0.8) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(94, 35, 0, 0.15) !important;
+    color: #5e2300 !important;
 }
 
 /* Mandiri Branded Card Layout Overrides */
 .data-card.bank-mandiri .bank-accesses-box {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(84, 53, 7, 0.12) !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(84, 53, 7, 0.15) !important;
 }
 .data-card.bank-mandiri .bank-access-tabs-pill {
-    background: rgba(84, 53, 7, 0.08) !important;
-    border-color: rgba(84, 53, 7, 0.06) !important;
+    background: rgba(84, 53, 7, 0.1) !important;
+    border-color: rgba(84, 53, 7, 0.08) !important;
 }
 .data-card.bank-mandiri .bank-access-tab-link {
     color: #543507 !important;
@@ -1644,12 +1662,12 @@ header {
 .data-card.bank-mandiri .bank-access-tab-link.active {
     background: #543507 !important;
     border-color: #543507 !important;
-    color: #ebb976 !important;
+    color: #ffffff !important;
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.15) !important;
 }
 .data-card.bank-mandiri .bank-credentials-grid {
-    background: rgba(255, 255, 255, 0.35) !important;
-    border-color: rgba(84, 53, 7, 0.12) !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(84, 53, 7, 0.15) !important;
 }
 .data-card.bank-mandiri .bank-cred-cell {
     border-color: rgba(84, 53, 7, 0.1) !important;
@@ -1669,24 +1687,24 @@ header {
     background: rgba(84, 53, 7, 0.08) !important;
 }
 .data-card.bank-mandiri .bank-pill-btn {
-    background: rgba(255, 255, 255, 0.45) !important;
-    border-color: rgba(84, 53, 7, 0.15) !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-color: rgba(84, 53, 7, 0.2) !important;
     color: #543507 !important;
 }
 .data-card.bank-mandiri .bank-pill-btn:hover {
-    background: rgba(255, 255, 255, 0.75) !important;
-    border-color: rgba(84, 53, 7, 0.25) !important;
+    background: #ffffff !important;
+    border-color: rgba(84, 53, 7, 0.3) !important;
     box-shadow: 0 4px 15px rgba(84, 53, 7, 0.1) !important;
 }
 .data-card.bank-mandiri .bank-note-box {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(84, 53, 7, 0.12) !important;
-    color: rgba(84, 53, 7, 0.8) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(84, 53, 7, 0.15) !important;
+    color: #543507 !important;
 }
 
 /* BRI Branded Card Layout Overrides */
 .data-card.bank-bri .bank-accesses-box {
-    background: #fcfbf8 !important;
+    background: #fdfdfc !important;
     border-color: var(--border-color) !important;
 }
 .data-card.bank-bri .bank-access-tabs-pill {
@@ -1708,7 +1726,7 @@ header {
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.1) !important;
 }
 .data-card.bank-bri .bank-credentials-grid {
-    background: #fcfbf8 !important;
+    background: #ffffff !important;
     border-color: var(--border-color) !important;
 }
 .data-card.bank-bri .bank-cred-cell {
@@ -1729,7 +1747,7 @@ header {
     background: var(--bg-secondary) !important;
 }
 .data-card.bank-bri .bank-pill-btn {
-    background: #fcfbf8 !important;
+    background: #ffffff !important;
     border-color: var(--border-color) !important;
     color: var(--text-primary) !important;
 }
@@ -1738,7 +1756,7 @@ header {
     box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
 }
 .data-card.bank-bri .bank-note-box {
-    background: #fcfbf8 !important;
+    background: #fdfdfc !important;
     border-color: var(--border-color) !important;
     color: var(--text-muted) !important;
 }
