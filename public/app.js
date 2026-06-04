@@ -921,22 +921,34 @@ function renderBanks() {
                     </div>
                 </div>
                 <div class="bank-header-right">
-                    <div class="bank-acc-no-row">
-                        <span class="bank-acc-no">${escapeHTML(bank.accountNo)}</span>
+                    <div class="bank-action-buttons">
+                        <button class="copy-icon-btn" onclick="editBank('${bank.id}')" title="Edit Rekening">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        </button>
+                        <button class="copy-icon-btn text-danger" onclick="deleteBank('${bank.id}')" title="Hapus Rekening" style="color: rgba(234, 112, 102, 0.85);">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bank-account-info-row">
+                <div class="acc-info-block">
+                    <span class="acc-info-label">NOMOR REKENING</span>
+                    <div class="acc-info-val-row">
+                        <span class="acc-info-value">${escapeHTML(bank.accountNo)}</span>
                         <button class="copy-icon-btn" onclick="copyRawText('${escapeJSVal(bank.accountNo)}')" title="Salin Rekening">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                         </button>
                     </div>
-                    <div class="bank-acc-name-row" style="display: flex; align-items: center; gap: 8px;">
-                        <span class="bank-acc-name">${escapeHTML(bank.accountName)}</span>
-                        <div style="display: flex; gap: 4px; margin-left: 4px;">
-                            <button class="copy-icon-btn" onclick="editBank('${bank.id}')" title="Edit Rekening">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            </button>
-                            <button class="copy-icon-btn" onclick="deleteBank('${bank.id}')" title="Hapus Rekening" style="color: rgba(234, 112, 102, 0.75);">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                        </div>
+                </div>
+                <div class="acc-info-block">
+                    <span class="acc-info-label">ATAS NAMA</span>
+                    <div class="acc-info-val-row">
+                        <span class="acc-info-value">${escapeHTML(bank.accountName)}</span>
+                        <button class="copy-icon-btn" onclick="copyRawText('${escapeJSVal(bank.accountName)}')" title="Salin Nama Pemilik">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                        </button>
                     </div>
                 </div>
             </div>
