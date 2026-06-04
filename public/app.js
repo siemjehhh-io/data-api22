@@ -2190,11 +2190,11 @@ function getBankLogoHtml(bankName) {
     if (name.includes('bca')) {
         logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg';
     } else if (name.includes('bni')) {
-        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Negara_Indonesia.svg';
+        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/8/83/Bank_Negara_Indonesia_logo_%282004%29.svg';
     } else if (name.includes('bri')) {
-        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_Logo.svg';
+        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/d/d0/BRI_2020.svg';
     } else if (name.includes('mandiri')) {
-        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg';
+        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Bank_Mandiri_logo_2016.svg';
     }
 
     if (logoUrl) {
