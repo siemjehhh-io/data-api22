@@ -912,41 +912,39 @@ function renderBanks() {
         card.id = `bank-card-${bank.id}`;
         
         let fieldsHtml = `
-            <div class="data-card-header" style="margin-bottom: 20px;">
-                <div class="data-card-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <div class="bank-header-new">
+                <div class="bank-header-left">
                     ${getBankLogoHtml(bank.name)}
-                    <span style="font-weight: 800; font-family: var(--font-heading); color: var(--text-primary); font-size: 1.15rem; vertical-align: middle;">${escapeHTML(bank.name)}</span>
-                    <span class="category-tag ${bank.category || 'dp'}">${(bank.category || 'dp').toUpperCase()}</span>
+                    <div class="bank-title-group">
+                        <span class="bank-name-title">${escapeHTML(bank.name)}</span>
+                        <span class="bank-category-subtitle">(${bank.category === 'dp' ? 'Deposit' : 'Withdrawal'})</span>
+                    </div>
                 </div>
-                <div class="data-card-actions">
-                    <button class="action-btn edit" onclick="editBank('${bank.id}')" title="Edit Rekening">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                    </button>
-                    <button class="action-btn delete" onclick="deleteBank('${bank.id}')" title="Hapus Rekening">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="data-field" style="padding: 10px 14px; margin-bottom: 10px;">
-                <div class="data-field-info">
-                    <span class="data-field-label">No. Rekening</span>
-                    <span class="data-field-value" style="font-size: 0.95rem;">${escapeHTML(bank.accountNo)}</span>
-                </div>
-                <button class="copy-btn" onclick="copyRawText('${escapeJSVal(bank.accountNo)}')" title="Salin Rekening">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                </button>
-            </div>
-            <div class="data-field" style="padding: 10px 14px; margin-bottom: 10px;">
-                <div class="data-field-info">
-                    <span class="data-field-label">Atas Nama (A/N)</span>
-                    <span class="data-field-value" style="font-size: 0.95rem;">${escapeHTML(bank.accountName)}</span>
+                <div class="bank-header-right">
+                    <div class="bank-acc-no-row">
+                        <span class="bank-acc-no">${escapeHTML(bank.accountNo)}</span>
+                        <button class="copy-icon-btn" onclick="copyRawText('${escapeJSVal(bank.accountNo)}')" title="Salin Rekening">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                        </button>
+                    </div>
+                    <div class="bank-acc-name-row" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="bank-acc-name">${escapeHTML(bank.accountName)}</span>
+                        <div style="display: flex; gap: 4px; margin-left: 4px;">
+                            <button class="copy-icon-btn" onclick="editBank('${bank.id}')" title="Edit Rekening">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            </button>
+                            <button class="copy-icon-btn" onclick="deleteBank('${bank.id}')" title="Hapus Rekening" style="color: rgba(234, 112, 102, 0.75);">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
 
         if (bank.note) {
             fieldsHtml += `
-                <div style="margin-top: 8px; margin-bottom: 10px; font-size: 0.75rem; background: rgba(0,0,0,0.02); padding: 8px 12px; border-radius: var(--radius-sm); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                <div style="margin-top: 8px; margin-bottom: 12px; font-size: 0.75rem; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 8px; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.04);">
                     <strong>Catatan Rekening:</strong> ${escapeHTML(bank.note)}
                 </div>
             `;
@@ -956,15 +954,14 @@ function renderBanks() {
         const accesses = bank.accesses || [];
         if (accesses.length > 0) {
             fieldsHtml += `
-                <div style="margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 12px;">
-                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Akses E-Banking</div>
-                    <div class="bank-access-tabs" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;">
+                <div class="bank-accesses-box">
+                    <div class="bank-access-tabs-pill">
             `;
             
             accesses.forEach((acc, aIdx) => {
                 const typeLabel = bankTypeLabels[acc.type || 'custom'] || 'Kustom';
                 fieldsHtml += `
-                    <button class="bank-access-tab" data-access-id="${acc.id}" onclick="switchBankAccessTab('${bank.id}', '${acc.id}')" style="flex-shrink: 0; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: var(--transition);">
+                    <button class="bank-access-tab-link" data-access-id="${acc.id}" onclick="switchBankAccessTab('${bank.id}', '${acc.id}')">
                         ${escapeHTML(typeLabel)}
                     </button>
                 `;
@@ -972,90 +969,92 @@ function renderBanks() {
             
             fieldsHtml += `
                     </div>
-                </div>
-                <div class="bank-access-panels" style="margin-top: 8px;">
+                    <div class="bank-access-panels">
             `;
             
             accesses.forEach((acc, aIdx) => {
-                const typeLabel = bankTypeLabels[acc.type || 'custom'] || 'Kustom';
                 const isBca = nameLower.includes('bca') || acc.type.toLowerCase().includes('bca');
                 const passLabel = isBca ? 'KeyBCA / Password' : 'Password Login';
                 
                 fieldsHtml += `
                     <div class="bank-access-panel" id="panel-${bank.id}-${acc.id}" style="display: none; animation: slideDown 0.3s ease;">
-                        <div class="bank-access-grid">
+                        <div class="bank-credentials-grid">
                             ${acc.user ? `
-                                <div class="compact-data-field">
-                                    <div class="compact-data-field-info">
-                                        <span class="compact-data-field-label">Username</span>
-                                        <span class="compact-data-field-value">${escapeHTML(acc.user)}</span>
+                                <div class="bank-cred-cell">
+                                    <div class="bank-cred-label">Username:</div>
+                                    <div class="bank-cred-val-row">
+                                        <span class="bank-cred-value">${escapeHTML(acc.user)}</span>
+                                        <button class="copy-btn-nobg" onclick="copyRawText('${escapeJSVal(acc.user)}')" title="Salin Username">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                        </button>
                                     </div>
-                                    <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.user)}')" title="Salin Username">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                    </button>
-                                </div>
-                            ` : ''}
-                            
-                            ${acc.corpId ? `
-                                <div class="compact-data-field">
-                                    <div class="compact-data-field-info">
-                                        <span class="compact-data-field-label">Corporate ID</span>
-                                        <span class="compact-data-field-value">${escapeHTML(acc.corpId)}</span>
-                                    </div>
-                                    <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.corpId)}')" title="Salin Corporate ID">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                    </button>
                                 </div>
                             ` : ''}
                             
                             ${acc.password ? `
-                                <div class="compact-data-field">
-                                    <div class="compact-data-field-info">
-                                        <span class="compact-data-field-label">${passLabel}</span>
-                                        <span class="compact-data-field-value">${escapeHTML(acc.password)}</span>
+                                <div class="bank-cred-cell">
+                                    <div class="bank-cred-label">${passLabel}:</div>
+                                    <div class="bank-cred-val-row">
+                                        <span class="bank-cred-value password-val" data-value="${escapeHTML(acc.password)}" data-hidden="true">••••••••</span>
+                                        <div style="display: flex; gap: 4px;">
+                                            <button class="copy-btn-nobg" onclick="copyRawText('${escapeJSVal(acc.password)}')" title="Salin Password">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                            </button>
+                                            <button class="copy-btn-nobg eye-btn" onclick="togglePasswordVisibility(this)" title="Lihat Password">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.password)}')" title="Salin Password">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                    </button>
+                                </div>
+                            ` : ''}
+                            
+                            ${acc.corpId ? `
+                                <div class="bank-cred-cell">
+                                    <div class="bank-cred-label">Corporate ID:</div>
+                                    <div class="bank-cred-val-row">
+                                        <span class="bank-cred-value">${escapeHTML(acc.corpId)}</span>
+                                        <button class="copy-btn-nobg" onclick="copyRawText('${escapeJSVal(acc.corpId)}')" title="Salin Corporate ID">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                        </button>
+                                    </div>
                                 </div>
                             ` : ''}
                             
                             ${acc.pin ? `
-                                <div class="compact-data-field">
-                                    <div class="compact-data-field-info">
-                                        <span class="compact-data-field-label">PIN Transaksi</span>
-                                        <span class="compact-data-field-value">${escapeHTML(acc.pin)}</span>
+                                <div class="bank-cred-cell">
+                                    <div class="bank-cred-label">PIN:</div>
+                                    <div class="bank-cred-val-row">
+                                        <span class="bank-cred-value">${escapeHTML(acc.pin)}</span>
+                                        <button class="copy-btn-nobg" onclick="copyRawText('${escapeJSVal(acc.pin)}')" title="Salin PIN">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                        </button>
                                     </div>
-                                    <button class="copy-btn" onclick="copyRawText('${escapeJSVal(acc.pin)}')" title="Salin PIN">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                    </button>
                                 </div>
                             ` : ''}
                         </div>
                         
                         ${acc.note ? `
-                            <div style="margin-top: 8px; margin-bottom: 8px; font-size: 0.75rem; background: rgba(0,0,0,0.02); padding: 6px 10px; border-radius: var(--radius-sm); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                            <div style="margin-top: 8px; margin-bottom: 12px; font-size: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; color: rgba(255,255,255,0.6);">
                                 <strong>Keterangan Akses:</strong> ${escapeHTML(acc.note)}
                             </div>
                         ` : ''}
                         
-                        <div style="margin-top: 10px; display: flex; gap: 8px; width: 100%;">
-                            ${acc.url ? `
-                                <a href="${escapeHTML(acc.url)}" target="_blank" class="btn-secondary" style="flex: 1; font-size: 0.75rem; padding: 8px; justify-content: center; text-decoration: none; display: flex; align-items: center; gap: 4px; font-weight: 700;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                    Buka Link
-                                </a>
-                            ` : ''}
-                            <button class="btn-secondary" onclick="copyAllAccessData('${bank.id}', '${acc.id}')" style="flex: 1; font-size: 0.75rem; padding: 8px; justify-content: center; gap: 4px; font-weight: 700;">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                                Salin Chat
-                            </button>
-                        </div>
+                        ${acc.url ? `
+                            <a href="${escapeHTML(acc.url)}" target="_blank" class="bank-pill-btn">
+                                <span>Buka Link</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            </a>
+                        ` : ''}
+                        <button class="bank-pill-btn" onclick="copyAllAccessData('${bank.id}', '${acc.id}')">
+                            <span>Salin Data Chat</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                        </button>
                     </div>
                 `;
             });
             
             fieldsHtml += `
+                    </div>
                 </div>
             `;
         }
@@ -2028,7 +2027,7 @@ function switchBankAccessTab(bankId, accessId) {
     const isAlreadyActive = tabEl.classList.contains('active');
     
     // Deactivate all tabs and hide panels in this card
-    card.querySelectorAll('.bank-access-tab').forEach(tab => tab.classList.remove('active'));
+    card.querySelectorAll('.bank-access-tab-link').forEach(tab => tab.classList.remove('active'));
     card.querySelectorAll('.bank-access-panel').forEach(panel => {
         panel.classList.remove('active');
         panel.style.display = 'none';
@@ -2039,6 +2038,25 @@ function switchBankAccessTab(bankId, accessId) {
         tabEl.classList.add('active');
         panelEl.classList.add('active');
         panelEl.style.display = 'block';
+    }
+}
+
+function togglePasswordVisibility(btn) {
+    const valRow = btn.closest('.bank-cred-val-row');
+    if (!valRow) return;
+    
+    const valEl = valRow.querySelector('.password-val');
+    if (!valEl) return;
+    
+    const isHidden = valEl.getAttribute('data-hidden') === 'true';
+    if (isHidden) {
+        valEl.innerText = valEl.getAttribute('data-value');
+        valEl.setAttribute('data-hidden', 'false');
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>`;
+    } else {
+        valEl.innerText = '••••••••';
+        valEl.setAttribute('data-hidden', 'true');
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`;
     }
 }
 
@@ -2184,25 +2202,40 @@ function showToast(message) {
 
 function getBankLogoHtml(bankName) {
     const name = (bankName || '').toLowerCase();
-    let logoUrl = '';
-    let customStyle = 'height: 18px; width: auto; object-fit: contain; vertical-align: middle; margin-right: 4px; display: inline-block; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));';
-
+    
     if (name.includes('bca')) {
-        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg';
+        return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <circle cx="20" cy="18" r="9" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+            <path d="M20 12c-2 2-3 4-3 6s1 3 3 3s3-1 3-3s-1-4-3-6z" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+            <path d="M15 18h10" stroke="#ffffff" stroke-width="1"/>
+            <text x="20" y="33" font-family="'Inter', sans-serif" font-weight="900" font-size="5" fill="rgba(255,255,255,0.7)" text-anchor="middle" letter-spacing="0.5">BANK</text>
+        </svg>`;
     } else if (name.includes('bni')) {
-        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/8/83/Bank_Negara_Indonesia_logo_%282004%29.svg';
+        return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <text x="15" y="22" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="#ffffff" letter-spacing="0.5">BNI</text>
+            <circle cx="27" cy="18" r="3.5" fill="#ff6600"/>
+        </svg>`;
     } else if (name.includes('bri')) {
-        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/d/d0/BRI_2020.svg';
+        return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <text x="20" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle" letter-spacing="1">BRI</text>
+        </svg>`;
     } else if (name.includes('mandiri')) {
-        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Bank_Mandiri_logo_2016.svg';
+        return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <path d="M10 24 c5 -8, 15 -8, 20 0" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            <text x="20" y="17" font-family="'Inter', sans-serif" font-weight="900" font-size="7" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">mandırı</text>
+        </svg>`;
     }
 
-    if (logoUrl) {
-        return `<img src="${logoUrl}" alt="${escapeHTML(bankName)}" style="${customStyle}" onerror="this.style.display='none';">`;
-    }
-
-    // Generic credit card icon for custom banks
-    return `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px; color: var(--text-muted); display: inline-block;"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>`;
+    // Generic safe/bank card logo
+    const initials = (bankName || 'BK').trim().substring(0, 2).toUpperCase();
+    return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
+        <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+        <text x="20" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">${initials}</text>
+    </svg>`;
 }
 
 function escapeHTML(str) {
