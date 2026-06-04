@@ -1249,3 +1249,78 @@ header {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Compact e-banking credentials layout styles */
+.bank-access-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+@media (max-width: 480px) {
+    .bank-access-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.compact-data-field {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+.compact-data-field:hover {
+    border-color: var(--border-hover);
+}
+.compact-data-field-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.compact-data-field-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 1px;
+    font-weight: 700;
+}
+.compact-data-field-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Custom backgrounds inside compact fields for branded bank cards */
+.data-card.bank-bca .compact-data-field {
+    background: rgba(13, 56, 50, 0.03);
+    border-color: rgba(13, 56, 50, 0.12);
+}
+.data-card.bank-bca .compact-data-field:hover {
+    border-color: #0d3832;
+}
+
+.data-card.bank-bni .compact-data-field {
+    background: rgba(94, 35, 0, 0.03);
+    border-color: rgba(94, 35, 0, 0.12);
+}
+.data-card.bank-bni .compact-data-field:hover {
+    border-color: #5e2300;
+}
+
+.data-card.bank-mandiri .compact-data-field {
+    background: rgba(84, 53, 7, 0.03);
+    border-color: rgba(84, 53, 7, 0.12);
+}
+.data-card.bank-mandiri .compact-data-field:hover {
+    border-color: #543507;
+}
+
+
