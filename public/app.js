@@ -913,9 +913,9 @@ function renderBanks() {
         
         let fieldsHtml = `
             <div class="data-card-header" style="margin-bottom: 20px;">
-                <div class="data-card-title" style="display: flex; align-items: center; gap: 8px;">
-                    ${getBankLogoSvg(bank.name)}
-                    <span>${escapeHTML(bank.name)}</span>
+                <div class="data-card-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    ${getBankLogoHtml(bank.name)}
+                    <span style="font-weight: 800; font-family: var(--font-heading); color: var(--text-primary); font-size: 1.15rem; vertical-align: middle;">${escapeHTML(bank.name)}</span>
                     <span class="category-tag ${bank.category || 'dp'}">${(bank.category || 'dp').toUpperCase()}</span>
                 </div>
                 <div class="data-card-actions">
@@ -2182,35 +2182,27 @@ function showToast(message) {
     }, 2500);
 }
 
-function getBankLogoSvg(bankName) {
+function getBankLogoHtml(bankName) {
     const name = (bankName || '').toLowerCase();
+    let logoUrl = '';
+    let customStyle = 'height: 18px; width: auto; object-fit: contain; vertical-align: middle; margin-right: 4px; display: inline-block; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));';
+
     if (name.includes('bca')) {
-        return `<svg viewBox="0 0 100 35" width="65" height="23" style="vertical-align: middle; margin-right: 10px; border-radius: 4px; display: inline-block;">
-            <rect width="100" height="35" rx="4" fill="#0f2b5c"/>
-            <text x="50" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="18" fill="#ffffff" text-anchor="middle" letter-spacing="1.5">BCA</text>
-        </svg>`;
+        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg';
     } else if (name.includes('bni')) {
-        return `<svg viewBox="0 0 100 35" width="65" height="23" style="vertical-align: middle; margin-right: 10px; border-radius: 4px; display: inline-block;">
-            <rect width="100" height="35" rx="4" fill="#00667e"/>
-            <text x="35" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="18" fill="#ffffff" letter-spacing="0.5">BNI</text>
-            <circle cx="80" cy="17" r="7" fill="#ff6600"/>
-        </svg>`;
+        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Negara_Indonesia.svg';
     } else if (name.includes('bri')) {
-        return `<svg viewBox="0 0 100 35" width="65" height="23" style="vertical-align: middle; margin-right: 10px; border-radius: 4px; display: inline-block;">
-            <rect width="100" height="35" rx="4" fill="#00529c"/>
-            <text x="50" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="18" fill="#ffffff" text-anchor="middle" letter-spacing="1">BRI</text>
-        </svg>`;
+        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_Logo.svg';
     } else if (name.includes('mandiri')) {
-        return `<svg viewBox="0 0 100 35" width="65" height="23" style="vertical-align: middle; margin-right: 10px; border-radius: 4px; display: inline-block;">
-            <rect width="100" height="35" rx="4" fill="#1c3e7b"/>
-            <text x="50" y="22" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#f2a900" text-anchor="middle" letter-spacing="0.5">mandırı</text>
-        </svg>`;
+        logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg';
     }
-    return `<svg viewBox="0 0 100 35" width="65" height="23" style="vertical-align: middle; margin-right: 10px; border-radius: 4px; display: inline-block;">
-        <rect width="100" height="35" rx="4" fill="#4b5563"/>
-        <path d="M30 11 h40 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-40 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" fill="none" stroke="#ffffff" stroke-width="2"/>
-        <rect x="35" y="14" width="8" height="5" rx="1" fill="#fdb813"/>
-    </svg>`;
+
+    if (logoUrl) {
+        return `<img src="${logoUrl}" alt="${escapeHTML(bankName)}" style="${customStyle}" onerror="this.style.display='none';">`;
+    }
+
+    // Generic credit card icon for custom banks
+    return `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px; color: var(--text-muted); display: inline-block;"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>`;
 }
 
 function escapeHTML(str) {
