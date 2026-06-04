@@ -2,7 +2,7 @@ Write-Host "=== Starting PIN88 Auto-Deployment to VPS ===" -ForegroundColor Gree
 
 # 1. Copy Frontend static files
 Write-Host "Copying frontend static assets to VPS..." -ForegroundColor Cyan
-scp index.html style.css app.js crypto-js.min.js logo.png siemjeh-vps:/home/kuyaba/pin88-app/public/
+scp public/index.html public/style.css public/app.js public/crypto-js.min.js public/logo.png siemjeh-vps:/home/kuyaba/pin88-app/public/
 
 # 2. Copy Backend code
 Write-Host "Copying backend server scripts to VPS..." -ForegroundColor Cyan

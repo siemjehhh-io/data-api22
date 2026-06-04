@@ -29,10 +29,69 @@ function debugIndex() {
 }
 
 function doGet(e) {
+  // Jika parameter request berisi 'action', handle sebagai JSON API
+  if (e && e.parameter && e.parameter.action) {
+    return handleApiRequest(e.parameter);
+  }
+  
   return HtmlService.createTemplateFromFile('Index')
       .evaluate()
       .setTitle('PIN88 - Data & Akses Dashboard')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function doPost(e) {
+  var params;
+  try {
+    params = JSON.parse(e.postData.contents);
+  } catch(err) {
+    params = e.parameter;
+  }
+  
+  return handleApiRequest(params);
+}
+
+function handleApiRequest(params) {
+  var action = params.action;
+  var result = { success: false, error: "Action tidak dikenal: " + action };
+  
+  try {
+    if (action === "initSheets") {
+      result = initSheets();
+    } else if (action === "getAllData") {
+      result = getAllData();
+    } else if (action === "saveMainContacts") {
+      result = saveMainContacts(params.data);
+    } else if (action === "saveBackupContact") {
+      result = saveBackupContact(params.data);
+    } else if (action === "deleteBackupContact") {
+      result = deleteBackupContact(params.id);
+    } else if (action === "saveBank") {
+      result = saveBank(params.data);
+    } else if (action === "deleteBank") {
+      result = deleteBank(params.id);
+    } else if (action === "saveSocial") {
+      result = saveSocial(params.data);
+    } else if (action === "deleteSocial") {
+      result = deleteSocial(params.id);
+    } else if (action === "saveQris") {
+      result = saveQris(params.data);
+    } else if (action === "deleteQris") {
+      result = deleteQris(params.id);
+    } else if (action === "savePulsa") {
+      result = savePulsa(params.data);
+    } else if (action === "deletePulsa") {
+      result = deletePulsa(params.id);
+    } else if (action === "clearAllData") {
+      result = clearAllData();
+    }
+  } catch(err) {
+    result = { success: false, error: err.message };
+  }
+  
+  // Set CORS headers so that external frontends (e.g. Vercel) can access it
+  return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
 }
 
 function include(filename) {

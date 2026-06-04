@@ -105,37 +105,60 @@
                 </header>
 
                 <div class="dashboard-grid">
-                    <!-- CONTACT INFO CARD -->
-                    <div class="card" style="grid-column: span 2;" id="mainContactsCard">
-                        <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                                Kontak Utama Web
+                    <!-- LEFT COLUMN (60%) -->
+                    <div class="dashboard-left-col">
+                        <!-- CONTACT INFO CARD -->
+                        <div class="card" id="mainContactsCard">
+                            <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                    Kontak Utama Web
+                                </div>
+                                <button class="btn-primary" onclick="openModal('modalMainContacts')" style="font-size: 0.8rem; padding: 8px 16px; border-radius: var(--radius-sm); margin: 0; box-shadow: none; display: flex; align-items: center; gap: 6px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                    Edit Kontak Utama
+                                </button>
                             </div>
-                            <button class="btn-primary" onclick="openModal('modalMainContacts')" style="font-size: 0.8rem; padding: 8px 16px; border-radius: var(--radius-sm); margin: 0; box-shadow: none; display: flex; align-items: center; gap: 6px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                Edit Kontak Utama
-                            </button>
-                        </div>
-                        <div id="mainContactsContainer">
-                            <!-- Dynamic main contacts render -->
+                            <div id="mainContactsContainer">
+                                <!-- Dynamic main contacts render -->
+                            </div>
                         </div>
                     </div>
 
-                    <!-- BACKUP CONTACTS CARD -->
-                    <div class="card" id="backupContactsCard">
-                        <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                Kontak Cadangan
+                    <!-- RIGHT COLUMN (40%) -->
+                    <div class="dashboard-right-col">
+                        <!-- DAFTAR LINK & DOMAIN AKTIF CARD -->
+                        <div class="card" id="domainsCard" style="margin-bottom: 30px;">
+                            <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                                    Daftar Link & Domain Aktif
+                                </div>
+                                <button class="btn-primary" onclick="openManageDomainsModal()" style="font-size: 0.8rem; padding: 8px 16px; border-radius: var(--radius-sm); margin: 0; box-shadow: none; display: flex; align-items: center; gap: 6px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                    Kelola Domain
+                                </button>
                             </div>
-                            <button class="btn-primary" onclick="openModal('modalAddBackupContact')" style="font-size: 0.8rem; padding: 8px 16px; border-radius: var(--radius-sm); margin: 0; box-shadow: none; display: flex; align-items: center; gap: 6px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-                                Tambah Cadangan
-                            </button>
+                            <div id="domainsContainer" style="display: flex; flex-direction: column;">
+                                <!-- Dynamic domains render -->
+                            </div>
                         </div>
-                        <div id="backupContactsContainer" style="display: flex; flex-direction: column;">
-                            <!-- Dynamic backup contacts render -->
+
+                        <!-- BACKUP CONTACTS CARD -->
+                        <div class="card" id="backupContactsCard">
+                            <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                    Kontak Cadangan
+                                </div>
+                                <button class="btn-primary" onclick="openModal('modalAddBackupContact')" style="font-size: 0.8rem; padding: 8px 16px; border-radius: var(--radius-sm); margin: 0; box-shadow: none; display: flex; align-items: center; gap: 6px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+                                    Tambah Cadangan
+                                </button>
+                            </div>
+                            <div id="backupContactsContainer" style="display: flex; flex-direction: column;">
+                                <!-- Dynamic backup contacts render -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -150,6 +173,11 @@
                         <div class="stat-label">SOSMED & LIVE CHAT</div>
                         <div class="stat-value" id="statSocials">0</div>
                         <div class="stat-desc">Akses login aktif</div>
+                    </div>
+                    <div class="stat-card stat-yellow" id="statDomainsCard">
+                        <div class="stat-label">LINK & DOMAIN AKTIF</div>
+                        <div class="stat-value" id="statDomains">0</div>
+                        <div class="stat-desc">Domain terdaftar</div>
                     </div>
                 </div>
             </section>
@@ -570,6 +598,41 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeModal('modalAddPulsa')">Batal</button>
                     <button type="submit" class="btn-primary">Simpan Pulsa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: MANAGE DOMAINS -->
+    <div id="modalManageDomains" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Kelola Link & Domain Aktif</h3>
+                <button class="close-modal" onclick="closeModal('modalManageDomains')">&times;</button>
+            </div>
+            <form onsubmit="saveDomains(event)">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Domain Utama</label>
+                    <input type="text" id="inDomainUtama" class="form-control" placeholder="Contoh: https://pin88.com">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Domain RTP Aktif</label>
+                    <input type="text" id="inDomainRtp" class="form-control" placeholder="Contoh: https://rtppin88.xyz">
+                </div>
+                
+                <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; margin-bottom: 25px;">
+                    <label style="display: block; font-size: 1rem; color: var(--text-primary); margin-bottom: 10px; font-weight: 700;">Domain Alternatif</label>
+                    <div id="formAltDomainsContainer">
+                        <!-- Dynamic rows will be inserted here -->
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="addAltDomainRow('')" style="width: 100%; justify-content: center; margin-top: 10px; font-size: 0.9rem; padding: 10px; font-weight: 600; border-style: dashed; border-color: var(--accent-active); color: var(--accent-active); margin-bottom: 10px;">
+                        + Tambah Domain Alternatif
+                    </button>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('modalManageDomains')">Batal</button>
+                    <button type="submit" class="btn-primary">Simpan Domain</button>
                 </div>
             </form>
         </div>

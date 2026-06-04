@@ -405,26 +405,115 @@ header {
     color: var(--pastel-yellow-text);
 }
 
-/* Dashboard Layout Grid */
+/* Dashboard Layout Grid Split (60/40) */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: 1.6fr 1fr;
     gap: 30px;
     margin-bottom: 40px;
+    align-items: start;
 }
 
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dashboard-left-col,
+.dashboard-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Premium Card Design with subtle gradient background and top accent borders */
 .card {
-    background: var(--bg-card);
+    background: linear-gradient(145deg, #ffffff 0%, #faf8f5 100%);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 35px;
     box-shadow: var(--shadow-soft);
+    position: relative;
+    overflow: hidden;
     transition: var(--transition);
+}
+
+/* Accent top border colors for each card */
+#mainContactsCard {
+    border-top: 4px solid var(--accent-active);
+}
+#domainsCard {
+    border-top: 4px solid var(--pastel-blue);
+}
+#backupContactsCard {
+    border-top: 4px solid var(--pastel-yellow);
+}
+
+/* Subtly animated corner radial gradients for premium feel */
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    pointer-events: none;
+    transition: var(--transition);
+}
+
+#mainContactsCard::after {
+    background: radial-gradient(circle at 100% 0%, rgba(205, 162, 131, 0.05) 0%, transparent 70%);
+}
+#domainsCard::after {
+    background: radial-gradient(circle at 100% 0%, rgba(139, 196, 242, 0.08) 0%, transparent 70%);
+}
+#backupContactsCard::after {
+    background: radial-gradient(circle at 100% 0%, rgba(235, 185, 118, 0.08) 0%, transparent 70%);
 }
 
 .card:hover {
     border-color: var(--border-hover);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-md);
+}
+
+.card:hover::after {
+    transform: scale(1.1);
+}
+
+/* Drag and Drop visual styles for bank cards */
+.bank-drag-handle {
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    opacity: 0.35;
+    margin-right: 8px;
+    padding: 4px;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.bank-drag-handle:hover {
+    opacity: 0.85;
+    color: var(--text-primary);
+}
+.bank-drag-handle:active {
+    cursor: grabbing;
+}
+.data-card.bank {
+    transition: var(--transition), border-color 0.15s ease, opacity 0.15s ease;
+}
+.data-card.bank.dragging {
+    opacity: 0.45 !important;
+    border: 2px dashed var(--accent-active) !important;
+    box-shadow: none !important;
+    transform: scale(0.98);
+}
+.data-card.bank.drag-over {
+    border: 2px solid var(--accent-active) !important;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-lg) !important;
 }
 
 .card-title {

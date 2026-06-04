@@ -13,7 +13,12 @@ let db = {
     banks: [],
     socials: [],
     qris: [],
-    pulsa: []
+    pulsa: [],
+    domains: {
+        utama: "",
+        rtp: "",
+        alternatif: []
+    }
 };
 
 // ============================================================
@@ -72,6 +77,7 @@ function loadAllDataFromSheets(callback) {
         hideLoadingOverlay();
         if (result && result.db) {
             db = result.db;
+            initDomainsAfterLoad();
             renderApp();
             if (callback) callback();
         }
@@ -404,7 +410,12 @@ function saveDatabaseToStorage() {
                 balance: encrypt(p.balance || ""),
                 difference: encrypt(p.difference || ""),
                 note: encrypt(p.note || "")
-            }))
+            })),
+            domains: {
+                utama: encrypt(db.domains?.utama || ""),
+                rtp: encrypt(db.domains?.rtp || ""),
+                alternatif: (db.domains?.alternatif || []).map(url => encrypt(url))
+            }
         };
         localStorage.setItem('pin88_secure_db', JSON.stringify(encryptedDb));
         
@@ -632,6 +643,21 @@ function loadDatabaseFromStorage() {
             difference: decrypt(p.difference) || "",
             note: decrypt(p.note) || ""
         }));
+
+        // Decrypt domains
+        if (encryptedDb.domains) {
+            db.domains = {
+                utama: decrypt(encryptedDb.domains.utama || ""),
+                rtp: decrypt(encryptedDb.domains.rtp || ""),
+                alternatif: (encryptedDb.domains.alternatif || []).map(url => decrypt(url))
+            };
+        } else {
+            db.domains = {
+                utama: "",
+                rtp: "",
+                alternatif: []
+            };
+        }
         
         // Validation check (if any decrypted value is null, password key might be wrong)
         if (rawPhone === null && rawData.length > 50) {
@@ -647,12 +673,18 @@ function loadDatabaseFromStorage() {
 
 // UI Rendering
 function renderApp() {
+    // Ensure domains state is initialized
+    initDomainsAfterLoad();
+
     // Render Main & Backup Contacts
     renderContacts();
 
     // Stats
     document.getElementById('statBanks').innerText = db.banks.length;
     document.getElementById('statSocials').innerText = db.socials.length;
+
+    // Render Domains
+    renderDomains();
 
     // Render Bank List
     renderBanks();
@@ -766,6 +798,249 @@ function renderContacts() {
             `;
             backupContainer.appendChild(row);
         });
+    }
+}
+
+// ============================================================
+// LOGIKA LINK & DOMAIN AKTIF (BARU)
+// ============================================================
+
+function initDomainsAfterLoad() {
+    // Migrasi atau load fallback dari localStorage jika db.domains kosong
+    if (!db.domains || (!db.domains.utama && !db.domains.rtp && (!db.domains.alternatif || db.domains.alternatif.length === 0))) {
+        const localDomainsEncrypted = localStorage.getItem('pin88_local_domains_encrypted');
+        if (localDomainsEncrypted) {
+            try {
+                const decryptedStr = decrypt(localDomainsEncrypted);
+                if (decryptedStr) {
+                    const parsed = JSON.parse(decryptedStr);
+                    if (parsed && typeof parsed === 'object') {
+                        db.domains = {
+                            utama: parsed.utama || "",
+                            rtp: parsed.rtp || "",
+                            alternatif: parsed.alternatif || []
+                        };
+                    }
+                }
+            } catch (e) {
+                console.error("Error decrypting local fallback domains:", e);
+            }
+        }
+    }
+    if (!db.domains) {
+        db.domains = { utama: "", rtp: "", alternatif: [] };
+    }
+    if (!db.domains.alternatif) {
+        db.domains.alternatif = [];
+    }
+}
+
+function renderDomains() {
+    const container = document.getElementById('domainsContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    const utama = db.domains.utama || "";
+    const rtp = db.domains.rtp || "";
+    const alternatif = db.domains.alternatif || [];
+    
+    // Update stats count
+    let totalDomainsCount = 0;
+    if (utama) totalDomainsCount++;
+    if (rtp) totalDomainsCount++;
+    totalDomainsCount += alternatif.length;
+    
+    const statDomainsElem = document.getElementById('statDomains');
+    if (statDomainsElem) {
+        statDomainsElem.innerText = totalDomainsCount;
+    }
+    
+    const rows = [];
+    
+    // 1. Domain Utama
+    rows.push({
+        label: 'Domain Utama',
+        value: utama,
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>`,
+        borderLeftColor: 'var(--accent-active)'
+    });
+    
+    // 2. Domain Alternatif
+    if (alternatif.length > 0) {
+        alternatif.forEach((url, index) => {
+            rows.push({
+                label: `Domain Alternatif ${alternatif.length > 1 ? (index + 1) : ''}`,
+                value: url,
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>`,
+                borderLeftColor: 'var(--pastel-blue)'
+            });
+        });
+    } else {
+        rows.push({
+            label: 'Domain Alternatif',
+            value: '',
+            icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>`,
+            borderLeftColor: 'var(--pastel-blue)'
+        });
+    }
+    
+    // 3. Domain RTP Aktif
+    rows.push({
+        label: 'Domain RTP Aktif',
+        value: rtp,
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-yellow-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
+        borderLeftColor: 'var(--pastel-yellow)'
+    });
+    
+    rows.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'contact-row-highlighted';
+        row.style.borderLeftColor = r.borderLeftColor;
+        
+        const hasVal = !!r.value;
+        const displayVal = hasVal ? r.value : 'Belum diisi';
+        
+        const copyButton = hasVal ? `
+            <button class="copy-btn" onclick="copyRawText('${escapeJSVal(r.value)}')" title="Salin">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+            </button>
+        ` : '';
+        
+        const openButton = hasVal ? `
+            <a href="${escapeHTML(r.value)}" target="_blank" class="copy-btn" style="display: flex; align-items: center; justify-content: center; text-decoration: none;" title="Buka Link">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            </a>
+        ` : '';
+        
+        row.innerHTML = `
+            <div style="display: flex; align-items: flex-start; gap: 12px; width: 100%;">
+                <div class="contact-icon-wrapper" style="background: rgba(0,0,0,0.03);">${r.icon}</div>
+                <div style="flex-grow: 1;">
+                    <div class="contact-label-new">${r.label}</div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                        <span class="contact-value-new ${hasVal ? 'filled' : 'empty'}" style="font-size: 0.95rem; word-break: break-all;">${escapeHTML(displayVal)}</span>
+                        ${copyButton}
+                        ${openButton}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(row);
+    });
+}
+
+function openManageDomainsModal() {
+    document.getElementById('inDomainUtama').value = db.domains?.utama || '';
+    document.getElementById('inDomainRtp').value = db.domains?.rtp || '';
+    
+    const container = document.getElementById('formAltDomainsContainer');
+    container.innerHTML = '';
+    
+    const alternatif = db.domains?.alternatif || [];
+    if (alternatif.length === 0) {
+        addAltDomainRow('');
+    } else {
+        alternatif.forEach(url => addAltDomainRow(url));
+    }
+    
+    openModal('modalManageDomains');
+}
+
+function addAltDomainRow(value = '') {
+    const container = document.getElementById('formAltDomainsContainer');
+    const rowId = 'alt-domain-row-' + Math.random().toString(36).substr(2, 9);
+    
+    const row = document.createElement('div');
+    row.className = 'alt-domain-row';
+    row.id = rowId;
+    row.style = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
+    row.innerHTML = `
+        <input type="text" class="form-control alt-domain-input" value="${escapeHTML(value)}" placeholder="Contoh: https://pin88alt.net" style="flex-grow: 1;">
+        <button type="button" class="action-btn delete" onclick="removeAltDomainRow('${rowId}')" title="Hapus" style="width: 38px; height: 38px; flex-shrink: 0; padding: 0; display: flex; align-items: center; justify-content: center; margin: 0;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+        </button>
+    `;
+    container.appendChild(row);
+}
+
+function removeAltDomainRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row) {
+        row.remove();
+    }
+}
+
+function saveDomains(event) {
+    if (event) event.preventDefault();
+    
+    const utama = document.getElementById('inDomainUtama').value.trim();
+    const rtp = document.getElementById('inDomainRtp').value.trim();
+    
+    const inputs = document.querySelectorAll('.alt-domain-input');
+    const alternatif = [];
+    inputs.forEach(input => {
+        const val = input.value.trim();
+        if (val) {
+            alternatif.push(val);
+        }
+    });
+    
+    const domainsData = {
+        utama: utama,
+        rtp: rtp,
+        alternatif: alternatif
+    };
+    
+    db.domains = domainsData;
+    
+    // Save to local backup fallback
+    localStorage.setItem('pin88_local_domains_encrypted', encrypt(JSON.stringify(domainsData)));
+    
+    showLoadingOverlay('Menyimpan data domain...');
+    
+    const onSaveSuccess = () => {
+        hideLoadingOverlay();
+        closeModal('modalManageDomains');
+        renderApp();
+        showToast('Data Link & Domain berhasil disimpan!');
+    };
+    
+    const onSaveError = (err) => {
+        hideLoadingOverlay();
+        console.warn("Failed to sync domains with backend, fallback used:", err);
+        closeModal('modalManageDomains');
+        renderApp();
+        showToast('Tersimpan di Lokal browser!');
+    };
+    
+    if (getDbMode() === 'sheets') {
+        callSheetsAPI('saveDomains', domainsData, onSaveSuccess, (err) => {
+            // Fallback success
+            onSaveSuccess();
+        });
+    } else {
+        const success = saveDatabaseToStorage();
+        if (success) {
+            onSaveSuccess();
+        } else {
+            onSaveError(new Error("Gagal menyimpan ke penyimpanan lokal."));
+        }
+    }
+}
+
+function reorderBanks(draggedId, targetId) {
+    const draggedIdx = db.banks.findIndex(b => b.id === draggedId);
+    const targetIdx = db.banks.findIndex(b => b.id === targetId);
+    
+    if (draggedIdx !== -1 && targetIdx !== -1) {
+        // Swap or move item
+        const [draggedBank] = db.banks.splice(draggedIdx, 1);
+        db.banks.splice(targetIdx, 0, draggedBank);
+        
+        renderBanks();
+        saveDatabaseToStorage();
+        showToast('Urutan kartu bank berhasil diatur!');
     }
 }
 
@@ -911,9 +1186,23 @@ function renderBanks() {
         card.className = `data-card bank ${bankClass}`;
         card.id = `bank-card-${bank.id}`;
         
+        const dragHandleHtml = `
+            <div class="bank-drag-handle" title="Tarik untuk mengatur urutan">
+                <svg width="12" height="18" viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="2.5" cy="3" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="3" r="1.5" fill="currentColor" />
+                    <circle cx="2.5" cy="9" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="9" r="1.5" fill="currentColor" />
+                    <circle cx="2.5" cy="15" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="15" r="1.5" fill="currentColor" />
+                </svg>
+            </div>
+        `;
+        
         let fieldsHtml = `
             <div class="bank-header-new">
-                <div class="bank-header-left">
+                <div class="bank-header-left" style="display: flex; align-items: center;">
+                    ${dragHandleHtml}
                     ${getBankLogoHtml(bank.name)}
                     <div class="bank-title-group">
                         <span class="bank-name-title">${escapeHTML(bank.name)}</span>
@@ -1075,6 +1364,58 @@ function renderBanks() {
         }
         
         card.innerHTML = fieldsHtml;
+        
+        // Attach drag-and-drop listeners
+        const handle = card.querySelector('.bank-drag-handle');
+        if (handle) {
+            handle.addEventListener('mousedown', () => {
+                card.setAttribute('draggable', 'true');
+            });
+            handle.addEventListener('mouseup', () => {
+                card.setAttribute('draggable', 'false');
+            });
+        }
+        
+        card.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', bank.id);
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            card.setAttribute('draggable', 'false');
+            document.querySelectorAll('.data-card.bank').forEach(c => {
+                c.classList.remove('drag-over');
+            });
+        });
+        
+        card.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        });
+        
+        card.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            if (!card.classList.contains('dragging')) {
+                card.classList.add('drag-over');
+            }
+        });
+        
+        card.addEventListener('dragleave', () => {
+            card.classList.remove('drag-over');
+        });
+        
+        card.addEventListener('drop', (e) => {
+            e.preventDefault();
+            card.classList.remove('drag-over');
+            const draggedBankId = e.dataTransfer.getData('text/plain');
+            if (draggedBankId === bank.id) return;
+            
+            reorderBanks(draggedBankId, bank.id);
+        });
+        
         container.appendChild(card);
     });
 }
