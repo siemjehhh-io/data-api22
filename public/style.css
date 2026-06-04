@@ -1251,37 +1251,20 @@ header {
 
 /* Premium Glassmorphism Card Style for all Bank Cards */
 .data-card.bank {
-    background: linear-gradient(135deg, rgba(23, 31, 48, 0.7) 0%, rgba(13, 17, 26, 0.85) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: linear-gradient(135deg, rgba(23, 31, 48, 0.7) 0%, rgba(13, 17, 26, 0.85) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px !important;
     padding: 24px !important;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
-    color: #ffffff !important;
+    color: #ffffff;
     position: relative;
     overflow: visible;
+    transition: var(--transition);
 }
 .data-card.bank::before {
     display: none !important;
-}
-
-/* Subtle glow effects matching brand colors */
-.data-card.bank.bank-bca {
-    box-shadow: 0 8px 32px 0 rgba(0, 86, 158, 0.15), inset 0 1px 1px rgba(255,255,255,0.08) !important;
-    border-color: rgba(0, 86, 158, 0.35) !important;
-}
-.data-card.bank.bank-bni {
-    box-shadow: 0 8px 32px 0 rgba(255, 102, 0, 0.12), inset 0 1px 1px rgba(255,255,255,0.08) !important;
-    border-color: rgba(255, 102, 0, 0.28) !important;
-}
-.data-card.bank.bank-bri {
-    box-shadow: 0 8px 32px 0 rgba(0, 82, 156, 0.15), inset 0 1px 1px rgba(255,255,255,0.08) !important;
-    border-color: rgba(0, 82, 156, 0.35) !important;
-}
-.data-card.bank.bank-mandiri {
-    box-shadow: 0 8px 32px 0 rgba(242, 169, 0, 0.12), inset 0 1px 1px rgba(255,255,255,0.08) !important;
-    border-color: rgba(242, 169, 0, 0.28) !important;
 }
 
 /* New Bank Card Header layout */
@@ -1305,12 +1288,13 @@ header {
     font-family: var(--font-heading);
     font-size: 1.4rem;
     font-weight: 800;
-    color: #ffffff;
+    color: inherit;
     line-height: 1.1;
 }
 .bank-category-subtitle {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: inherit;
+    opacity: 0.6;
     font-weight: 500;
 }
 .bank-header-right {
@@ -1326,11 +1310,12 @@ header {
 .bank-acc-no {
     font-size: 1.15rem;
     font-weight: 700;
-    color: #ffffff;
+    color: inherit;
 }
 .bank-acc-name {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: inherit;
+    opacity: 0.7;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1339,7 +1324,8 @@ header {
 .copy-icon-btn {
     background: transparent;
     border: none;
-    color: rgba(255,255,255,0.5);
+    color: inherit;
+    opacity: 0.5;
     cursor: pointer;
     padding: 2px;
     display: inline-flex;
@@ -1348,7 +1334,19 @@ header {
     transition: var(--transition);
 }
 .copy-icon-btn:hover {
-    color: #ffffff;
+    opacity: 1;
+}
+
+/* Reusable class for note boxes (replaces inline styles for dynamic colors) */
+.bank-note-box {
+    margin-top: 8px;
+    margin-bottom: 12px;
+    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Accesses container panel matching the photo */
@@ -1375,7 +1373,8 @@ header {
     text-align: center;
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.45);
+    color: inherit;
+    opacity: 0.45;
     padding: 8px 12px;
     font-size: 0.85rem;
     font-weight: 700;
@@ -1385,12 +1384,13 @@ header {
     white-space: nowrap;
 }
 .bank-access-tab-link:hover {
-    color: #ffffff;
+    opacity: 0.9;
 }
 .bank-access-tab-link.active {
     background: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.06);
     color: #ffffff !important;
+    opacity: 1;
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2);
 }
 
@@ -1426,7 +1426,8 @@ header {
 }
 .bank-cred-label {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: inherit;
+    opacity: 0.5;
     margin-bottom: 4px;
 }
 .bank-cred-val-row {
@@ -1438,7 +1439,7 @@ header {
 .bank-cred-value {
     font-size: 1rem;
     font-weight: 700;
-    color: #ffffff;
+    color: inherit;
     letter-spacing: 0.3px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1447,7 +1448,8 @@ header {
 .copy-btn-nobg {
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.4);
+    color: inherit;
+    opacity: 0.5;
     cursor: pointer;
     padding: 3px;
     border-radius: 4px;
@@ -1457,7 +1459,7 @@ header {
     transition: var(--transition);
 }
 .copy-btn-nobg:hover {
-    color: #ffffff;
+    opacity: 1;
     background: rgba(255, 255, 255, 0.06);
 }
 
@@ -1467,7 +1469,7 @@ header {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 10px;
-    color: #ffffff;
+    color: inherit;
     padding: 12px;
     font-size: 0.85rem;
     font-weight: 700;
@@ -1487,4 +1489,244 @@ header {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* ==========================================
+   BRAND-SPECIFIC LAYOUT OVERRIDES (COLOR THEMES)
+   ========================================== */
+
+/* BCA Branded Card Layout Overrides */
+.data-card.bank-bca .bank-accesses-box {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(13, 56, 50, 0.12) !important;
+}
+.data-card.bank-bca .bank-access-tabs-pill {
+    background: rgba(13, 56, 50, 0.08) !important;
+    border-color: rgba(13, 56, 50, 0.06) !important;
+}
+.data-card.bank-bca .bank-access-tab-link {
+    color: #0d3832 !important;
+    opacity: 0.65;
+}
+.data-card.bank-bca .bank-access-tab-link:hover {
+    opacity: 1;
+}
+.data-card.bank-bca .bank-access-tab-link.active {
+    background: #0d3832 !important;
+    border-color: #0d3832 !important;
+    color: #8cd4cb !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+.data-card.bank-bca .bank-credentials-grid {
+    background: rgba(255, 255, 255, 0.35) !important;
+    border-color: rgba(13, 56, 50, 0.12) !important;
+}
+.data-card.bank-bca .bank-cred-cell {
+    border-color: rgba(13, 56, 50, 0.1) !important;
+}
+.data-card.bank-bca .bank-cred-label {
+    color: rgba(13, 56, 50, 0.7) !important;
+}
+.data-card.bank-bca .bank-cred-value {
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .copy-btn-nobg {
+    color: #0d3832 !important;
+    opacity: 0.6;
+}
+.data-card.bank-bca .copy-btn-nobg:hover {
+    opacity: 1;
+    background: rgba(13, 56, 50, 0.08) !important;
+}
+.data-card.bank-bca .bank-pill-btn {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(13, 56, 50, 0.15) !important;
+    color: #0d3832 !important;
+}
+.data-card.bank-bca .bank-pill-btn:hover {
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(13, 56, 50, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(13, 56, 50, 0.1) !important;
+}
+.data-card.bank-bca .bank-note-box {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(13, 56, 50, 0.12) !important;
+    color: rgba(13, 56, 50, 0.8) !important;
+}
+
+/* BNI Branded Card Layout Overrides */
+.data-card.bank-bni .bank-accesses-box {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(94, 35, 0, 0.12) !important;
+}
+.data-card.bank-bni .bank-access-tabs-pill {
+    background: rgba(94, 35, 0, 0.08) !important;
+    border-color: rgba(94, 35, 0, 0.06) !important;
+}
+.data-card.bank-bni .bank-access-tab-link {
+    color: #5e2300 !important;
+    opacity: 0.65;
+}
+.data-card.bank-bni .bank-access-tab-link:hover {
+    opacity: 1;
+}
+.data-card.bank-bni .bank-access-tab-link.active {
+    background: #5e2300 !important;
+    border-color: #5e2300 !important;
+    color: #f2a379 !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+.data-card.bank-bni .bank-credentials-grid {
+    background: rgba(255, 255, 255, 0.35) !important;
+    border-color: rgba(94, 35, 0, 0.12) !important;
+}
+.data-card.bank-bni .bank-cred-cell {
+    border-color: rgba(94, 35, 0, 0.1) !important;
+}
+.data-card.bank-bni .bank-cred-label {
+    color: rgba(94, 35, 0, 0.7) !important;
+}
+.data-card.bank-bni .bank-cred-value {
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .copy-btn-nobg {
+    color: #5e2300 !important;
+    opacity: 0.6;
+}
+.data-card.bank-bni .copy-btn-nobg:hover {
+    opacity: 1;
+    background: rgba(94, 35, 0, 0.08) !important;
+}
+.data-card.bank-bni .bank-pill-btn {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(94, 35, 0, 0.15) !important;
+    color: #5e2300 !important;
+}
+.data-card.bank-bni .bank-pill-btn:hover {
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(94, 35, 0, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(94, 35, 0, 0.1) !important;
+}
+.data-card.bank-bni .bank-note-box {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(94, 35, 0, 0.12) !important;
+    color: rgba(94, 35, 0, 0.8) !important;
+}
+
+/* Mandiri Branded Card Layout Overrides */
+.data-card.bank-mandiri .bank-accesses-box {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(84, 53, 7, 0.12) !important;
+}
+.data-card.bank-mandiri .bank-access-tabs-pill {
+    background: rgba(84, 53, 7, 0.08) !important;
+    border-color: rgba(84, 53, 7, 0.06) !important;
+}
+.data-card.bank-mandiri .bank-access-tab-link {
+    color: #543507 !important;
+    opacity: 0.65;
+}
+.data-card.bank-mandiri .bank-access-tab-link:hover {
+    opacity: 1;
+}
+.data-card.bank-mandiri .bank-access-tab-link.active {
+    background: #543507 !important;
+    border-color: #543507 !important;
+    color: #ebb976 !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.15) !important;
+}
+.data-card.bank-mandiri .bank-credentials-grid {
+    background: rgba(255, 255, 255, 0.35) !important;
+    border-color: rgba(84, 53, 7, 0.12) !important;
+}
+.data-card.bank-mandiri .bank-cred-cell {
+    border-color: rgba(84, 53, 7, 0.1) !important;
+}
+.data-card.bank-mandiri .bank-cred-label {
+    color: rgba(84, 53, 7, 0.7) !important;
+}
+.data-card.bank-mandiri .bank-cred-value {
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .copy-btn-nobg {
+    color: #543507 !important;
+    opacity: 0.6;
+}
+.data-card.bank-mandiri .copy-btn-nobg:hover {
+    opacity: 1;
+    background: rgba(84, 53, 7, 0.08) !important;
+}
+.data-card.bank-mandiri .bank-pill-btn {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border-color: rgba(84, 53, 7, 0.15) !important;
+    color: #543507 !important;
+}
+.data-card.bank-mandiri .bank-pill-btn:hover {
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-color: rgba(84, 53, 7, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(84, 53, 7, 0.1) !important;
+}
+.data-card.bank-mandiri .bank-note-box {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(84, 53, 7, 0.12) !important;
+    color: rgba(84, 53, 7, 0.8) !important;
+}
+
+/* BRI Branded Card Layout Overrides */
+.data-card.bank-bri .bank-accesses-box {
+    background: #fcfbf8 !important;
+    border-color: var(--border-color) !important;
+}
+.data-card.bank-bri .bank-access-tabs-pill {
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+.data-card.bank-bri .bank-access-tab-link {
+    color: var(--text-muted) !important;
+    opacity: 0.8;
+}
+.data-card.bank-bri .bank-access-tab-link:hover {
+    opacity: 1;
+    color: var(--text-primary) !important;
+}
+.data-card.bank-bri .bank-access-tab-link.active {
+    background: var(--accent-active) !important;
+    border-color: var(--accent-active) !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+.data-card.bank-bri .bank-credentials-grid {
+    background: #fcfbf8 !important;
+    border-color: var(--border-color) !important;
+}
+.data-card.bank-bri .bank-cred-cell {
+    border-color: var(--border-color) !important;
+}
+.data-card.bank-bri .bank-cred-label {
+    color: var(--text-muted) !important;
+}
+.data-card.bank-bri .bank-cred-value {
+    color: var(--text-primary) !important;
+}
+.data-card.bank-bri .copy-btn-nobg {
+    color: var(--text-secondary) !important;
+    opacity: 0.8;
+}
+.data-card.bank-bri .copy-btn-nobg:hover {
+    opacity: 1;
+    background: var(--bg-secondary) !important;
+}
+.data-card.bank-bri .bank-pill-btn {
+    background: #fcfbf8 !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+.data-card.bank-bri .bank-pill-btn:hover {
+    background: var(--bg-secondary) !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
+}
+.data-card.bank-bri .bank-note-box {
+    background: #fcfbf8 !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-muted) !important;
 }

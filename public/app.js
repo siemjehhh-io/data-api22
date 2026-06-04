@@ -944,7 +944,7 @@ function renderBanks() {
 
         if (bank.note) {
             fieldsHtml += `
-                <div style="margin-top: 8px; margin-bottom: 12px; font-size: 0.75rem; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 8px; color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.04);">
+                <div class="bank-note-box">
                     <strong>Catatan Rekening:</strong> ${escapeHTML(bank.note)}
                 </div>
             `;
@@ -1034,7 +1034,7 @@ function renderBanks() {
                         </div>
                         
                         ${acc.note ? `
-                            <div style="margin-top: 8px; margin-bottom: 12px; font-size: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; color: rgba(255,255,255,0.6);">
+                            <div class="bank-note-box">
                                 <strong>Keterangan Akses:</strong> ${escapeHTML(acc.note)}
                             </div>
                         ` : ''}
@@ -2205,36 +2205,36 @@ function getBankLogoHtml(bankName) {
     
     if (name.includes('bca')) {
         return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
-            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-            <circle cx="20" cy="18" r="9" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-            <path d="M20 12c-2 2-3 4-3 6s1 3 3 3s3-1 3-3s-1-4-3-6z" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-            <path d="M15 18h10" stroke="#ffffff" stroke-width="1"/>
-            <text x="20" y="33" font-family="'Inter', sans-serif" font-weight="900" font-size="5" fill="rgba(255,255,255,0.7)" text-anchor="middle" letter-spacing="0.5">BANK</text>
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25;"/>
+            <circle cx="20" cy="18" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M20 12c-2 2-3 4-3 6s1 3 3 3s3-1 3-3s-1-4-3-6z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M15 18h10" stroke="currentColor" stroke-width="1"/>
+            <text x="20" y="33" font-family="'Inter', sans-serif" font-weight="900" font-size="5" fill="currentColor" style="opacity: 0.7;" text-anchor="middle" letter-spacing="0.5">BANK</text>
         </svg>`;
     } else if (name.includes('bni')) {
         return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
-            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-            <text x="15" y="22" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="#ffffff" letter-spacing="0.5">BNI</text>
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25;"/>
+            <text x="15" y="22" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="currentColor" letter-spacing="0.5">BNI</text>
             <circle cx="27" cy="18" r="3.5" fill="#ff6600"/>
         </svg>`;
     } else if (name.includes('bri')) {
         return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
-            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-            <text x="20" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#ffffff" text-anchor="middle" letter-spacing="1">BRI</text>
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25;"/>
+            <text x="20" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="currentColor" text-anchor="middle" letter-spacing="1">BRI</text>
         </svg>`;
     } else if (name.includes('mandiri')) {
         return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
-            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-            <path d="M10 24 c5 -8, 15 -8, 20 0" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-            <text x="20" y="17" font-family="'Inter', sans-serif" font-weight="900" font-size="7" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">mandırı</text>
+            <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25;"/>
+            <path d="M10 24 c5 -8, 15 -8, 20 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <text x="20" y="17" font-family="'Inter', sans-serif" font-weight="900" font-size="7" fill="currentColor" text-anchor="middle" letter-spacing="0.5">mandırı</text>
         </svg>`;
     }
 
     // Generic safe/bank card logo
     const initials = (bankName || 'BK').trim().substring(0, 2).toUpperCase();
     return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
-        <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-        <text x="20" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="#ffffff" text-anchor="middle">${initials}</text>
+        <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25;"/>
+        <text x="20" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="currentColor" text-anchor="middle">${initials}</text>
     </svg>`;
 }
 
