@@ -1028,10 +1028,86 @@ header {
         grid-template-columns: 1fr;
     }
     aside {
-        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: auto;
+        height: 65px;
+        margin: 0;
+        padding: 5px 10px;
+        border-radius: 0;
+        border: none;
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -4px 20px rgba(74, 62, 61, 0.08);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 1000;
+        overflow: hidden;
+        top: auto;
+    }
+    .logo-section {
+        display: none !important;
+    }
+    .sidebar-nav {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-around;
+        gap: 0;
+        margin: 0;
+        align-items: center;
+    }
+    .nav-item {
+        flex-direction: column;
+        gap: 4px;
+        padding: 6px 8px;
+        font-size: 0.7rem;
+        border-radius: var(--radius-sm);
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        background: transparent;
+    }
+    .nav-item span {
+        display: block !important;
+        font-size: 0.65rem;
+        font-weight: 700;
+    }
+    .nav-item svg {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+    }
+    .sidebar-footer {
+        display: none !important;
     }
     main {
-        padding: 20px;
+        padding: 20px 20px 95px 20px !important;
+    }
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .header-title h1 {
+        font-size: 1.8rem;
+    }
+    .header-title p {
+        font-size: 0.95rem;
+    }
+    .card {
+        padding: 20px !important;
+    }
+    .data-card {
+        padding: 20px !important;
+    }
+    .card-title {
+        font-size: 1.2rem;
+        padding-bottom: 12px;
+        margin-bottom: 18px;
     }
 }
 
@@ -1156,7 +1232,14 @@ header {
     padding: 5px;
     border-radius: var(--radius-md);
     width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
     border: 1px solid var(--border-color);
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.sub-tabs-container::-webkit-scrollbar {
+    display: none;
 }
 
 .sub-tab-item {
@@ -1171,6 +1254,7 @@ header {
     font-size: 0.85rem;
     color: var(--text-secondary);
     transition: var(--transition);
+    flex-shrink: 0;
 }
 
 .sub-tab-item:hover {
@@ -1457,7 +1541,7 @@ header {
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: inherit;
 }
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .bank-account-info-row {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -1564,13 +1648,16 @@ header {
     overflow: hidden;
     margin-bottom: 14px;
 }
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .bank-credentials-grid {
         grid-template-columns: 1fr;
     }
-    .bank-cred-cell:nth-child(odd) {
+    .bank-credentials-grid > .bank-cred-cell {
         border-right: none !important;
-        border-bottom: 1px solid #e2e8f0 !important;
+        border-top: 1px solid #e2e8f0 !important;
+    }
+    .bank-credentials-grid > .bank-cred-cell:first-child {
+        border-top: none !important;
     }
 }
 .bank-cred-cell {
