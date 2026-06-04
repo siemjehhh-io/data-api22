@@ -1424,6 +1424,18 @@ header {
 .bank-credentials-grid > .bank-cred-cell:nth-child(n+3) {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
+/* Grid spanning for proportional layouts when cells are odd or single */
+.bank-credentials-grid > .bank-cred-cell:only-child {
+    grid-column: span 2;
+    border-right: none !important;
+}
+.bank-credentials-grid > .bank-cred-cell:nth-child(3):last-child {
+    grid-column: span 2;
+    border-right: none !important;
+}
+.bank-credentials-grid > .bank-cred-cell:last-child {
+    border-bottom: none !important;
+}
 .bank-cred-label {
     font-size: 0.75rem;
     color: inherit;

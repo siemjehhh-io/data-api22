@@ -960,8 +960,9 @@ function renderBanks() {
             
             accesses.forEach((acc, aIdx) => {
                 const typeLabel = bankTypeLabels[acc.type || 'custom'] || 'Kustom';
+                const activeClass = aIdx === 0 ? 'active' : '';
                 fieldsHtml += `
-                    <button class="bank-access-tab-link" data-access-id="${acc.id}" onclick="switchBankAccessTab('${bank.id}', '${acc.id}')">
+                    <button class="bank-access-tab-link ${activeClass}" data-access-id="${acc.id}" onclick="switchBankAccessTab('${bank.id}', '${acc.id}')">
                         ${escapeHTML(typeLabel)}
                     </button>
                 `;
@@ -975,9 +976,11 @@ function renderBanks() {
             accesses.forEach((acc, aIdx) => {
                 const isBca = nameLower.includes('bca') || acc.type.toLowerCase().includes('bca');
                 const passLabel = isBca ? 'KeyBCA / Password' : 'Password Login';
+                const displayVal = aIdx === 0 ? 'block' : 'none';
+                const activePanel = aIdx === 0 ? 'active' : '';
                 
                 fieldsHtml += `
-                    <div class="bank-access-panel" id="panel-${bank.id}-${acc.id}" style="display: none; animation: slideDown 0.3s ease;">
+                    <div class="bank-access-panel ${activePanel}" id="panel-${bank.id}-${acc.id}" style="display: ${displayVal}; animation: slideDown 0.3s ease;">
                         <div class="bank-credentials-grid">
                             ${acc.user ? `
                                 <div class="bank-cred-cell">
@@ -995,13 +998,13 @@ function renderBanks() {
                                 <div class="bank-cred-cell">
                                     <div class="bank-cred-label">${passLabel}:</div>
                                     <div class="bank-cred-val-row">
-                                        <span class="bank-cred-value password-val" data-value="${escapeHTML(acc.password)}" data-hidden="true">••••••••</span>
+                                        <span class="bank-cred-value password-val" data-value="${escapeHTML(acc.password)}" data-hidden="false">${escapeHTML(acc.password)}</span>
                                         <div style="display: flex; gap: 4px;">
                                             <button class="copy-btn-nobg" onclick="copyRawText('${escapeJSVal(acc.password)}')" title="Salin Password">
                                                 <svg xmlns="http://www.w3.org/2000/svg" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                                             </button>
-                                            <button class="copy-btn-nobg eye-btn" onclick="togglePasswordVisibility(this)" title="Lihat Password">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                            <button class="copy-btn-nobg eye-btn" onclick="togglePasswordVisibility(this)" title="Sembunyikan Password">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" /></svg>
                                             </button>
                                         </div>
                                     </div>
@@ -2024,8 +2027,6 @@ function switchBankAccessTab(bankId, accessId) {
     const panelEl = card.querySelector(`#panel-${bankId}-${accessId}`);
     if (!tabEl || !panelEl) return;
     
-    const isAlreadyActive = tabEl.classList.contains('active');
-    
     // Deactivate all tabs and hide panels in this card
     card.querySelectorAll('.bank-access-tab-link').forEach(tab => tab.classList.remove('active'));
     card.querySelectorAll('.bank-access-panel').forEach(panel => {
@@ -2033,12 +2034,10 @@ function switchBankAccessTab(bankId, accessId) {
         panel.style.display = 'none';
     });
     
-    // Toggle active if not already active
-    if (!isAlreadyActive) {
-        tabEl.classList.add('active');
-        panelEl.classList.add('active');
-        panelEl.style.display = 'block';
-    }
+    // Set clicked tab to active (non-collapsible)
+    tabEl.classList.add('active');
+    panelEl.classList.add('active');
+    panelEl.style.display = 'block';
 }
 
 function togglePasswordVisibility(btn) {
@@ -2204,18 +2203,18 @@ function getBankLogoHtml(bankName) {
     const name = (bankName || '').toLowerCase();
     
     if (name.includes('bca')) {
-        return `<img src="logo_bca.png" alt="BCA" style="width: 36px; height: 36px; object-fit: contain; display: block; flex-shrink: 0;">`;
+        return `<img src="logo_bca.png" alt="BCA" style="height: 40px; width: auto; max-width: 125px; object-fit: contain; display: block; flex-shrink: 0;">`;
     } else if (name.includes('bni')) {
-        return `<img src="logo_bni.png" alt="BNI" style="width: 36px; height: 36px; object-fit: contain; display: block; flex-shrink: 0;">`;
+        return `<img src="logo_bni.png" alt="BNI" style="height: 40px; width: auto; max-width: 125px; object-fit: contain; display: block; flex-shrink: 0;">`;
     } else if (name.includes('bri')) {
-        return `<img src="logo_bri.png" alt="BRI" style="width: 36px; height: 36px; object-fit: contain; display: block; flex-shrink: 0;">`;
+        return `<img src="logo_bri.png" alt="BRI" style="height: 40px; width: auto; max-width: 125px; object-fit: contain; display: block; flex-shrink: 0;">`;
     } else if (name.includes('mandiri')) {
-        return `<img src="logo_mandiri.png" alt="Mandiri" style="width: 36px; height: 36px; object-fit: contain; display: block; flex-shrink: 0;">`;
+        return `<img src="logo_mandiri.png" alt="Mandiri" style="height: 40px; width: auto; max-width: 125px; object-fit: contain; display: block; flex-shrink: 0;">`;
     }
 
     // Generic safe/bank card logo
     const initials = (bankName || 'BK').trim().substring(0, 2).toUpperCase();
-    return `<svg viewBox="0 0 40 40" width="36" height="36" style="display: block; flex-shrink: 0;">
+    return `<svg viewBox="0 0 40 40" width="40" height="40" style="display: block; flex-shrink: 0;">
         <rect x="1" y="1" width="38" height="38" rx="8" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.25;"/>
         <text x="20" y="24" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="currentColor" text-anchor="middle">${initials}</text>
     </svg>`;
