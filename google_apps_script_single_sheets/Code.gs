@@ -109,7 +109,7 @@ function initSheets() {
     // Banks
     _ensureSheet(ss, SHEETS.banks, [
       "id","name","type","category","accountNo","accountName",
-      "url","user","corpId","password","pin","note","updatedAt"
+      "url","user","corpId","password","pin","note","updatedAt","accesses"
     ]);
     // Pulsa
     _ensureSheet(ss, SHEETS.pulsa, [
@@ -192,7 +192,21 @@ function readSheet(sheetName) {
 
 function getAllData() {
   try {
+    ensureAccessesHeader();
     var banks    = readSheet(SHEETS.banks).data;
+    if (banks) {
+      banks.forEach(function(b) {
+        if (b.accesses) {
+          try {
+            b.accesses = JSON.parse(b.accesses);
+          } catch(err) {
+            b.accesses = [];
+          }
+        } else {
+          b.accesses = [];
+        }
+      });
+    }
     var pulsa    = readSheet(SHEETS.pulsa).data;
     var socials  = readSheet(SHEETS.socials).data;
     var qris     = readSheet(SHEETS.qris).data;
@@ -352,7 +366,34 @@ function saveMainContacts(contactsData) {
 // SAVE BANK
 // ============================================================
 
+function ensureAccessesHeader() {
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var sheet = ss.getSheetByName(SHEETS.banks);
+    if (sheet) {
+      var lastCol = sheet.getLastColumn();
+      if (lastCol > 0) {
+        var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+        if (headers.indexOf("accesses") === -1) {
+          // Append "accesses" to headers
+          sheet.getRange(1, lastCol + 1).setValue("accesses");
+          sheet.getRange(1, lastCol + 1)
+            .setBackground("#1a1a2e")
+            .setFontColor("#e8d5b7")
+            .setFontWeight("bold");
+        }
+      }
+    }
+  } catch(e) {
+    Logger.log("Failed to ensure accesses header: " + e.message);
+  }
+}
+
 function saveBank(bankData) {
+  ensureAccessesHeader();
+  if (bankData.accesses && typeof bankData.accesses === 'object') {
+    bankData.accesses = JSON.stringify(bankData.accesses);
+  }
   return saveRow(SHEETS.banks, bankData);
 }
 

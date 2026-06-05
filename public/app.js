@@ -77,6 +77,21 @@ function loadAllDataFromSheets(callback) {
         hideLoadingOverlay();
         if (result && result.db) {
             db = result.db;
+            
+            // Handle parsing of accesses if stored as serialized JSON string in sheet
+            if (db.banks) {
+                db.banks.forEach(bank => {
+                    if (bank.accesses && typeof bank.accesses === 'string') {
+                        try {
+                            bank.accesses = JSON.parse(bank.accesses);
+                        } catch(e) {
+                            bank.accesses = [];
+                        }
+                    }
+                });
+            }
+            
+            migrateDatabaseSchema();
             initDomainsAfterLoad();
             renderApp();
             if (callback) callback();
