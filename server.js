@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3088;
 const DB_FILE = path.join(__dirname, 'db.json');
-const API_TOKEN = 'pin88_sec_e2c8a7b9d4f6c8e3';
+const API_TOKEN = 'api22_sec_e2c8a7b9d4f6c8e3';
 
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Token validation middleware
 function checkToken(req, res, next) {
-    const token = req.headers['x-pin88-token'];
+    const token = req.headers['x-api22-token'];
     if (token === API_TOKEN) {
         next();
     } else {
@@ -55,5 +55,5 @@ app.get('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`PIN88 Backend API listening on port ${PORT}`);
+    console.log(`API22 Backend API listening on port ${PORT}`);
 });

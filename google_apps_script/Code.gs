@@ -1,5 +1,5 @@
 // ============================================================
-// PIN88 - Google Apps Script Backend
+// API22 - Google Apps Script Backend
 // Database: Google Sheets (shared & persistent)
 // ============================================================
 
@@ -36,7 +36,7 @@ function doGet(e) {
   
   return HtmlService.createTemplateFromFile('Index')
       .evaluate()
-      .setTitle('PIN88 - Data & Akses Dashboard')
+      .setTitle('API22 - Data & Akses Dashboard')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 

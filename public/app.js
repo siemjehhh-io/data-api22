@@ -1,5 +1,5 @@
 // State management
-const API_TOKEN = "pin88_sec_e2c8a7b9d4f6c8e3";
+const API_TOKEN = "api22_sec_e2c8a7b9d4f6c8e3";
 let masterKey = "";
 let currentBankFilter = "dp";
 let db = {
@@ -26,11 +26,11 @@ let db = {
 // ============================================================
 
 function getDbMode() {
-    return localStorage.getItem('pin88_db_mode') || 'local';
+    return localStorage.getItem('api22_db_mode') || 'local';
 }
 
 function callSheetsAPI(action, data, successCallback, failureCallback) {
-    const gasUrl = localStorage.getItem('pin88_gas_url');
+    const gasUrl = localStorage.getItem('api22_gas_url');
     if (!gasUrl) {
         if (failureCallback) failureCallback(new Error("URL Google Apps Script belum dikonfigurasi."));
         return;
@@ -107,7 +107,7 @@ function toggleDbModeSettings() {
     const fieldsDiv = document.getElementById('gasSettingsFields');
     if (mode === 'sheets') {
         fieldsDiv.style.display = 'block';
-        document.getElementById('gasWebAppUrlInput').value = localStorage.getItem('pin88_gas_url') || '';
+        document.getElementById('gasWebAppUrlInput').value = localStorage.getItem('api22_gas_url') || '';
     } else {
         fieldsDiv.style.display = 'none';
     }
@@ -134,8 +134,8 @@ function saveGasSettings() {
     .then(result => {
         hideLoadingOverlay();
         if (result && result.success) {
-            localStorage.setItem('pin88_db_mode', 'sheets');
-            localStorage.setItem('pin88_gas_url', gasUrl);
+            localStorage.setItem('api22_db_mode', 'sheets');
+            localStorage.setItem('api22_gas_url', gasUrl);
             showToast('Koneksi Google Sheets berhasil dihubungkan!');
             loadAllDataFromSheets();
         } else {
@@ -149,8 +149,8 @@ function saveGasSettings() {
 }
 
 function resetToLocalServerSettings() {
-    localStorage.removeItem('pin88_db_mode');
-    localStorage.removeItem('pin88_gas_url');
+    localStorage.removeItem('api22_db_mode');
+    localStorage.removeItem('api22_gas_url');
     document.getElementById('dbModeSelect').value = 'local';
     document.getElementById('gasSettingsFields').style.display = 'none';
     showToast('Reset ke Server API Lokal. Silakan reload halaman.');
@@ -158,8 +158,8 @@ function resetToLocalServerSettings() {
 }
 
 function resetToLocalMode() {
-    localStorage.setItem('pin88_db_mode', 'local');
-    localStorage.removeItem('pin88_gas_url');
+    localStorage.setItem('api22_db_mode', 'local');
+    localStorage.removeItem('api22_gas_url');
     showToast('Mengalihkan ke database Vercel KV...');
     setTimeout(() => window.location.reload(), 1000);
 }
@@ -189,8 +189,8 @@ function testSetupGasUrl() {
         btn.innerText = 'Hubungkan ke Sheets';
         btn.disabled = false;
         if (result && result.success) {
-            localStorage.setItem('pin88_db_mode', 'sheets');
-            localStorage.setItem('pin88_gas_url', gasUrl);
+            localStorage.setItem('api22_db_mode', 'sheets');
+            localStorage.setItem('api22_gas_url', gasUrl);
             showAlert('Koneksi Google Sheets berhasil! Silakan tentukan/masukkan Master Password di atas untuk masuk.', 'Sukses');
             document.getElementById('gasConfigContainer').style.display = 'none';
         } else {
@@ -206,17 +206,29 @@ function testSetupGasUrl() {
 
 // Initial Checks
 window.addEventListener('DOMContentLoaded', async () => {
+    // Auto-migrate legacy PIN88 keys to new API22 keys
+    const legacyKeys = [
+        'password_hash', 'secure_db', 'db_mode', 'gas_url', 
+        'local_domains_encrypted', 'active_domain', 'alternate_domains'
+    ];
+    legacyKeys.forEach(k => {
+        const pinValue = localStorage.getItem('pin88_' + k);
+        if (pinValue !== null && localStorage.getItem('api22_' + k) === null) {
+            localStorage.setItem('api22_' + k, pinValue);
+        }
+    });
+
     if (typeof CryptoJS === 'undefined') {
         showAlert("PERINGATAN: Library keamanan CryptoJS gagal dimuat secara lokal. Pastikan file 'crypto-js.min.js' ada di folder yang sama dengan 'index.html'.", "Peringatan Sistem");
     }
     
     // Default to 'local' mode (which on Vercel connects to our Serverless Vercel KV API)
-    if (!localStorage.getItem('pin88_db_mode')) {
-        localStorage.setItem('pin88_db_mode', 'local');
+    if (!localStorage.getItem('api22_db_mode')) {
+        localStorage.setItem('api22_db_mode', 'local');
     }
     
     const dbMode = getDbMode();
-    const gasUrl = localStorage.getItem('pin88_gas_url');
+    const gasUrl = localStorage.getItem('api22_gas_url');
     
     // Setup UI for Settings
     const modeSelect = document.getElementById('dbModeSelect');
@@ -254,14 +266,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 function checkPasswordStatus() {
-    const hash = localStorage.getItem('pin88_password_hash');
+    const hash = localStorage.getItem('api22_password_hash');
     const authTitle = document.getElementById('authTitle');
     const authDesc = document.getElementById('authDesc');
     const authBtnText = document.getElementById('authBtnText');
     
     if (hash) {
         authTitle.innerText = "Masukkan Master Password";
-        authDesc.innerText = "Gunakan kata sandi Anda untuk memecahkan enkripsi dan membuka data PIN88.";
+        authDesc.innerText = "Gunakan kata sandi Anda untuk memecahkan enkripsi dan membuka data API22.";
         authBtnText.innerText = "Buka Dashboard";
     } else {
         authTitle.innerText = "Set Master Password Baru";
@@ -274,10 +286,10 @@ function checkPasswordStatus() {
 function handleAuth(event) {
     event.preventDefault();
     const passwordInput = document.getElementById('masterPasswordInput').value;
-    const hash = localStorage.getItem('pin88_password_hash');
+    const hash = localStorage.getItem('api22_password_hash');
     const errorDiv = document.getElementById('authError');
     
-    if (getDbMode() === 'sheets' && !localStorage.getItem('pin88_gas_url')) {
+    if (getDbMode() === 'sheets' && !localStorage.getItem('api22_gas_url')) {
         showAlert('Silakan hubungkan database Google Sheets Anda terlebih dahulu sebelum masuk!', 'Peringatan');
         return;
     }
@@ -291,7 +303,7 @@ function handleAuth(event) {
         if (!hash) {
             // First time setup
             const newHash = CryptoJS.SHA256(passwordInput).toString();
-            localStorage.setItem('pin88_password_hash', newHash);
+            localStorage.setItem('api22_password_hash', newHash);
             masterKey = passwordInput;
             
             if (getDbMode() !== 'sheets') {
@@ -432,18 +444,18 @@ function saveDatabaseToStorage() {
                 alternatif: (db.domains?.alternatif || []).map(url => encrypt(url))
             }
         };
-        localStorage.setItem('pin88_secure_db', JSON.stringify(encryptedDb));
+        localStorage.setItem('api22_secure_db', JSON.stringify(encryptedDb));
         
         // Push payload to server API in the background
         const payload = {
-            hash: localStorage.getItem('pin88_password_hash'),
+            hash: localStorage.getItem('api22_password_hash'),
             db: encryptedDb
         };
         fetch('/api/db', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-PIN88-Token': API_TOKEN
+                'X-API22-Token': API_TOKEN
             },
             body: JSON.stringify(payload)
         }).catch(err => console.error("Failed to sync to server database:", err));
@@ -509,7 +521,7 @@ function migrateDatabaseSchema() {
 }
 
 function loadDatabaseFromStorage() {
-    const rawData = localStorage.getItem('pin88_secure_db');
+    const rawData = localStorage.getItem('api22_secure_db');
     if (!rawData) {
         // DB does not exist yet
         return true;
@@ -823,7 +835,7 @@ function renderContacts() {
 function initDomainsAfterLoad() {
     // Migrasi atau load fallback dari localStorage jika db.domains kosong
     if (!db.domains || (!db.domains.utama && !db.domains.rtp && (!db.domains.alternatif || db.domains.alternatif.length === 0))) {
-        const localDomainsEncrypted = localStorage.getItem('pin88_local_domains_encrypted');
+        const localDomainsEncrypted = localStorage.getItem('api22_local_domains_encrypted');
         if (localDomainsEncrypted) {
             try {
                 const decryptedStr = decrypt(localDomainsEncrypted);
@@ -971,7 +983,7 @@ function addAltDomainRow(value = '') {
     row.id = rowId;
     row.style = 'display: flex; gap: 10px; margin-bottom: 10px; align-items: center;';
     row.innerHTML = `
-        <input type="text" class="form-control alt-domain-input" value="${escapeHTML(value)}" placeholder="Contoh: https://pin88alt.net" style="flex-grow: 1;">
+        <input type="text" class="form-control alt-domain-input" value="${escapeHTML(value)}" placeholder="Contoh: https://api22alt.net" style="flex-grow: 1;">
         <button type="button" class="action-btn delete" onclick="removeAltDomainRow('${rowId}')" title="Hapus" style="width: 38px; height: 38px; flex-shrink: 0; padding: 0; display: flex; align-items: center; justify-content: center; margin: 0;">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
         </button>
@@ -1010,7 +1022,7 @@ function saveDomains(event) {
     db.domains = domainsData;
     
     // Save to local backup fallback
-    localStorage.setItem('pin88_local_domains_encrypted', encrypt(JSON.stringify(domainsData)));
+    localStorage.setItem('api22_local_domains_encrypted', encrypt(JSON.stringify(domainsData)));
     
     showLoadingOverlay('Menyimpan data domain...');
     
@@ -1958,7 +1970,7 @@ function changeMasterPassword(event) {
     event.preventDefault();
     const oldPass = document.getElementById('oldMasterPass').value;
     const newPass = document.getElementById('newMasterPass').value;
-    const currentHash = localStorage.getItem('pin88_password_hash');
+    const currentHash = localStorage.getItem('api22_password_hash');
     
     if (CryptoJS.SHA256(oldPass).toString() !== currentHash) {
         showAlert('Master Password lama salah!', 'Peringatan');
@@ -1967,7 +1979,7 @@ function changeMasterPassword(event) {
     
     // Set new key and hash
     masterKey = newPass;
-    localStorage.setItem('pin88_password_hash', CryptoJS.SHA256(newPass).toString());
+    localStorage.setItem('api22_password_hash', CryptoJS.SHA256(newPass).toString());
     
     // Re-encrypt database with the new key
     saveDatabaseToStorage();
@@ -1978,7 +1990,7 @@ function changeMasterPassword(event) {
 }
 
 async function clearAllData() {
-    if (await showConfirm('PERINGATAN: Seluruh data penting PIN88 akan dihapus secara permanen. Apakah Anda yakin?', 'Hapus Semua Data')) {
+    if (await showConfirm('PERINGATAN: Seluruh data penting API22 akan dihapus secara permanen. Apakah Anda yakin?', 'Hapus Semua Data')) {
         if (getDbMode() === 'sheets') {
             showLoadingOverlay('Menghapus seluruh data dari Google Sheets...');
             callSheetsAPI('clearAllData', null, function() {
@@ -2105,21 +2117,21 @@ async function deletePulsa(id) {
 
 // Export / Import JSON Encrypted File
 function exportData() {
-    const rawData = localStorage.getItem('pin88_secure_db');
+    const rawData = localStorage.getItem('api22_secure_db');
     if (!rawData) {
         showAlert('Tidak ada data untuk diekspor!', 'Informasi');
         return;
     }
     
     const exportObj = {
-        hash: localStorage.getItem('pin88_password_hash'),
+        hash: localStorage.getItem('api22_password_hash'),
         db: JSON.parse(rawData)
     };
     
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `PIN88_Secure_Backup_${new Date().toISOString().slice(0,10)}.json`);
+    downloadAnchor.setAttribute("download", `API22_Secure_Backup_${new Date().toISOString().slice(0,10)}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -2139,8 +2151,8 @@ function importData(event) {
             }
             
             if (await showConfirm('Mengimpor data baru akan menimpa data yang ada saat ini. Lanjutkan?', 'Konfirmasi Impor')) {
-                localStorage.setItem('pin88_password_hash', importedData.hash);
-                localStorage.setItem('pin88_secure_db', JSON.stringify(importedData.db));
+                localStorage.setItem('api22_password_hash', importedData.hash);
+                localStorage.setItem('api22_secure_db', JSON.stringify(importedData.db));
                 await showAlert('Data berhasil diimpor! Silakan masuk kembali dengan password dari file backup.', 'Impor Berhasil');
                 window.location.reload();
             }
@@ -2628,16 +2640,16 @@ function formatDisplayDate(dStr) {
 async function syncFromServer() {
     try {
         const response = await fetch('/api/db', {
-            headers: { 'X-PIN88-Token': API_TOKEN }
+            headers: { 'X-API22-Token': API_TOKEN }
         });
         if (!response.ok) throw new Error('API request failed');
         const data = await response.json();
         if (data && !data.empty) {
             if (data.hash) {
-                localStorage.setItem('pin88_password_hash', data.hash);
+                localStorage.setItem('api22_password_hash', data.hash);
             }
             if (data.db) {
-                localStorage.setItem('pin88_secure_db', JSON.stringify(data.db));
+                localStorage.setItem('api22_secure_db', JSON.stringify(data.db));
             }
         }
     } catch (err) {

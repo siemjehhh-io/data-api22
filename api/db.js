@@ -1,22 +1,22 @@
 // api/db.js
-// Vercel Serverless Function to handle PIN88 Database sync via Vercel KV (REST API)
+// Vercel Serverless Function to handle API22 Database sync via Vercel KV (REST API)
 
 const KV_REST_API_URL = process.env.KV_REST_API_URL;
 const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
-const API_TOKEN = 'pin88_sec_e2c8a7b9d4f6c8e3';
+const API_TOKEN = 'api22_sec_e2c8a7b9d4f6c8e3';
 
 export default async function handler(req, res) {
     // Enable CORS for frontend requests
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-PIN88-Token');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API22-Token');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
     // Token validation
-    const token = req.headers['x-pin88-token'];
+    const token = req.headers['x-api22-token'];
     if (token !== API_TOKEN) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
                     Authorization: `Bearer ${KV_REST_API_TOKEN}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(['GET', 'pin88_db'])
+                body: JSON.stringify(['GET', 'api22_db'])
             });
             if (!response.ok) throw new Error(`KV GET REST failed: ${response.status}`);
             
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
                     Authorization: `Bearer ${KV_REST_API_TOKEN}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(['SET', 'pin88_db', JSON.stringify(payload)])
+                body: JSON.stringify(['SET', 'api22_db', JSON.stringify(payload)])
             });
             if (!response.ok) throw new Error(`KV SET REST failed: ${response.status}`);
             

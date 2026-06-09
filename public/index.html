@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIN88 - Data & Akses Dashboard</title>
+    <title>API22 - Data & Akses Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
@@ -16,8 +16,8 @@
     <div id="authScreen" class="auth-container">
         <div class="auth-card">
             <!-- HD Logo display (Raw Transparent File) -->
-            <img src="logo.png" alt="PIN88 Logo" class="auth-logo-img" onerror="this.style.display='none'; document.getElementById('authLogoText').style.display='block';" style="max-width: 360px; width: 100%; height: auto; max-height: 120px; margin: 0 auto 25px; object-fit: contain; display: block; filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.2)); image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
-            <div id="authLogoText" class="auth-logo" style="display: none;">PIN88</div>
+            <img src="logo.png" alt="API22 Logo" class="auth-logo-img" onerror="this.style.display='none'; document.getElementById('authLogoText').style.display='block';" style="max-width: 360px; width: 100%; height: auto; max-height: 120px; margin: 0 auto 25px; object-fit: contain; display: block; filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.2)); image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+            <div id="authLogoText" class="auth-logo" style="display: none;">API22</div>
             <h2 id="authTitle" style="margin-top: 15px;">Set Master Password Baru</h2>
             <p id="authDesc" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
                 Tentukan Master Password untuk mengenkripsi data Anda secara lokal di browser ini.
@@ -58,9 +58,9 @@
         <!-- SIDEBAR -->
         <aside>
             <div class="logo-section" style="display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 40px; padding: 0 10px; min-height: 75px;">
-                <img id="logoImg" src="logo.png" alt="PIN88 Logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex'; document.getElementById('logoText').style.display='block';" style="max-height: 75px; max-width: 100%; object-fit: contain; display: block; filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.15)); image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
-                <div id="logoFallback" class="logo-icon" style="display: none; justify-content: center; align-items: center; margin-right: 12px;">P</div>
-                <div id="logoText" class="logo-text" style="display: none;">PIN88</div>
+                <img id="logoImg" src="logo.png" alt="API22 Logo" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex'; document.getElementById('logoText').style.display='block';" style="max-height: 75px; max-width: 100%; object-fit: contain; display: block; filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.15)); image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+                <div id="logoFallback" class="logo-icon" style="display: none; justify-content: center; align-items: center; margin-right: 12px;">A</div>
+                <div id="logoText" class="logo-text" style="display: none;">API22</div>
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-item active" onclick="switchTab('dashboard')" data-tab="dashboard">
@@ -99,7 +99,7 @@
             <section id="dashboardTab" class="tab-content">
                 <header>
                     <div class="header-title">
-                        <h1>PIN88 Dashboard</h1>
+                        <h1>API22 Dashboard</h1>
                         <p>Ringkasan Data Kontak Utama dan Akses Cepat</p>
                     </div>
                 </header>
@@ -187,7 +187,7 @@
                 <header>
                     <div class="header-title">
                         <h1>List Rekening Bank</h1>
-                        <p>Kredensial Login & Detail Rekening Deposit/Withdrawal PIN88</p>
+                        <p>Kredensial Login & Detail Rekening Deposit/Withdrawal API22</p>
                     </div>
                     <button class="btn-primary" id="btnHeaderBank" onclick="openModal('modalAddBank')">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
@@ -227,7 +227,7 @@
                 <header>
                     <div class="header-title">
                         <h1>Social Media & Live Chat</h1>
-                        <p>Kredensial Akses Sosial Media Web PIN88 (Instagram, Facebook, Live Chat, dll)</p>
+                        <p>Kredensial Akses Sosial Media Web API22 (Instagram, Facebook, Live Chat, dll)</p>
                     </div>
                     <button class="btn-primary" onclick="openModal('modalAddSocial')">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
@@ -308,7 +308,7 @@
                     <div class="card">
                         <div class="card-title">Ekspor / Impor Data</div>
                         <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5;">
-                            Anda bisa mencadangkan data penting PIN88 ini dalam bentuk file terenkripsi. File ini hanya bisa dibuka dengan Master Password saat ini.
+                            Anda bisa mencadangkan data penting API22 ini dalam bentuk file terenkripsi. File ini hanya bisa dibuka dengan Master Password saat ini.
                         </p>
                         <div style="display: flex; gap: 15px; margin-bottom: 20px;">
                             <button class="btn-primary" onclick="exportData()" style="flex: 1; justify-content: center;">
@@ -328,7 +328,7 @@
                 <div class="card" style="margin-top: 30px; border-color: rgba(255, 8, 68, 0.2);">
                     <div class="card-title" style="color: var(--accent-red); border-bottom-color: rgba(255, 8, 68, 0.1);">Zona Bahaya</div>
                     <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem;">
-                        Tindakan ini akan menghapus seluruh data PIN88 dari browser ini secara permanen. Pastikan Anda sudah mengekspor data terlebih dahulu jika ingin menyimpannya.
+                        Tindakan ini akan menghapus seluruh data API22 dari browser ini secara permanen. Pastikan Anda sudah mengekspor data terlebih dahulu jika ingin menyimpannya.
                     </p>
                     <button class="lock-btn" onclick="clearAllData()" style="width: auto; padding: 12px 24px;">Hapus Seluruh Data</button>
                 </div>
@@ -367,7 +367,7 @@
                 <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
                     <div class="form-group" style="margin-bottom: 10px;">
                         <label>Username Telegram Utama</label>
-                        <input type="text" id="inMainTG" class="form-control" placeholder="Contoh: @pin88_official">
+                        <input type="text" id="inMainTG" class="form-control" placeholder="Contoh: @api22_official">
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
                         <label style="font-size: 0.85rem; font-weight: normal; color: var(--text-secondary);">Catatan Username Telegram</label>
@@ -613,11 +613,11 @@
             <form onsubmit="saveDomains(event)">
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label>Domain Utama</label>
-                    <input type="text" id="inDomainUtama" class="form-control" placeholder="Contoh: https://pin88.com">
+                    <input type="text" id="inDomainUtama" class="form-control" placeholder="Contoh: https://api22.com">
                 </div>
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label>Domain RTP Aktif</label>
-                    <input type="text" id="inDomainRtp" class="form-control" placeholder="Contoh: https://rtppin88.xyz">
+                    <input type="text" id="inDomainRtp" class="form-control" placeholder="Contoh: https://rtpapi22.xyz">
                 </div>
                 
                 <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; margin-bottom: 25px;">

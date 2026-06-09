@@ -1,4 +1,4 @@
-Write-Host "=== PIN88 Auto-Deploy Watcher Started ===" -ForegroundColor Green
+Write-Host "=== API22 Auto-Deploy Watcher Started ===" -ForegroundColor Green
 Write-Host "Watching for file changes in local workspace..." -ForegroundColor Cyan
 Write-Host "Press Ctrl+C to stop the watcher." -ForegroundColor Yellow
 
@@ -21,11 +21,11 @@ $action = {
     
     try {
         if ($name -match 'index\.html|style\.css|app\.js|crypto-js\.min\.js|logo\.png') {
-            scp $name siemjeh-vps:/home/kuyaba/pin88-app/public/
+            scp $name siemjeh-vps:/home/kuyaba/api22-app/public/
             Write-Host "Successfully deployed $name to public web folder!" -ForegroundColor Green
         } elseif ($name -match 'server\.js|package\.json') {
-            scp $name siemjeh-vps:/home/kuyaba/pin88-app/
-            ssh siemjeh-vps "cd /home/kuyaba/pin88-app && pm2 restart pin88-app"
+            scp $name siemjeh-vps:/home/kuyaba/api22-app/
+            ssh siemjeh-vps "cd /home/kuyaba/api22-app && pm2 restart api22-app"
             Write-Host "Successfully deployed $name and restarted PM2 backend!" -ForegroundColor Green
         }
     } catch {
