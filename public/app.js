@@ -1033,14 +1033,18 @@ function renderDomains() {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </div>
-                <div style="display: flex; align-items: flex-start; gap: 12px; flex-grow: 1;">
-                    <div class="contact-icon-wrapper" style="background: rgba(0,0,0,0.03);">${r.icon}</div>
-                    <div style="flex-grow: 1;">
+                <div style="display: flex; align-items: flex-start; gap: 12px; flex-grow: 1; min-width: 0;">
+                    <div class="contact-icon-wrapper" style="background: rgba(0,0,0,0.03); flex-shrink: 0;">${r.icon}</div>
+                    <div style="flex-grow: 1; min-width: 0;">
                         <div class="contact-label-new">${r.label}</div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
-                            <span class="contact-value-new ${hasVal ? 'filled' : 'empty'}" style="font-size: 0.95rem; word-break: break-all;">${escapeHTML(displayVal)}</span>
-                            ${copyButton}
-                            ${openButton}
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 2px; width: 100%;">
+                            <span class="contact-value-new ${hasVal ? 'filled' : 'empty'}" style="font-size: 0.95rem; word-break: break-all; min-width: 0; flex-grow: 1;">${escapeHTML(displayVal)}</span>
+                            ${hasVal ? `
+                            <div style="flex-shrink: 0; display: flex; gap: 6px; align-items: center;">
+                                ${copyButton}
+                                ${openButton}
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
@@ -2613,7 +2617,7 @@ function addAccessFieldToForm(data = null) {
         </div>
         <div class="form-group" style="margin-bottom: 10px;" id="url-group-${rowId}">
             <label style="font-size: 0.8rem; margin-bottom: 4px;">Link URL Login</label>
-            <input type="url" class="form-control access-url" value="${escapeHTML(url)}" style="padding: 8px 12px; font-size: 0.9rem;" placeholder="https://...">
+            <input type="text" class="form-control access-url" value="${escapeHTML(url)}" style="padding: 8px 12px; font-size: 0.9rem;" placeholder="https://...">
         </div>
         <div class="form-group" style="margin-bottom: 0;">
             <label style="font-size: 0.8rem; margin-bottom: 4px;">Catatan Akses</label>
