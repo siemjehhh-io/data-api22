@@ -41,12 +41,38 @@ export default async function handler(req, res) {
             });
             if (!response.ok) throw new Error(`KV GET REST failed: ${response.status}`);
             
-            const result = await response.json();
+                        const result = await response.json();
             
-            // result.result contains the stringified payload
             if (result && result.result) {
                 return res.status(200).json(JSON.parse(result.result));
             } else {
+                // Fallback: Check if there is data under the legacy key 'pin88_db'
+                const legacyResponse = await fetch(KV_REST_API_URL, {
+                    method: 'POST',
+                    headers: { 
+                        Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(['GET', 'pin88_db'])
+                });
+                if (legacyResponse.ok) {
+                    const legacyResult = await legacyResponse.json();
+                    if (legacyResult && legacyResult.result) {
+                        const legacyData = JSON.parse(legacyResult.result);
+                        
+                        // Auto-migrate: save to the new key 'api22_db'
+                        await fetch(KV_REST_API_URL, {
+                            method: 'POST',
+                            headers: { 
+                                Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(['SET', 'api22_db', legacyResult.result])
+                        });
+                        
+                        return res.status(200).json(legacyData);
+                    }
+                }
                 return res.status(200).json({ empty: true });
             }
         } 
