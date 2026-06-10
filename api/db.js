@@ -78,10 +78,84 @@ export default async function handler(req, res) {
         } 
         
         if (req.method === 'POST') {
-            // Save to Vercel KV
             const payload = req.body;
             
-            // Write to Vercel KV using standard Redis command payload
+            // Check if incoming database payload is empty
+            const incomingDb = payload.db;
+            const incomingIsEmpty = !incomingDb || (
+                (!incomingDb.banks || incomingDb.banks.length === 0) &&
+                (!incomingDb.socials || incomingDb.socials.length === 0) &&
+                (!incomingDb.qris || incomingDb.qris.length === 0) &&
+                (!incomingDb.backupContacts || incomingDb.backupContacts.length === 0)
+            );
+
+            // Fetch current database state to check for active data and to prepare backup
+            let currentDbStr = null;
+            let existingHasData = false;
+            
+            const currentResponse = await fetch(KV_REST_API_URL, {
+                method: 'POST',
+                headers: { 
+                    Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(['GET', 'api22_db'])
+            });
+            
+            if (currentResponse.ok) {
+                const currentResult = await currentResponse.json();
+                if (currentResult && currentResult.result) {
+                    currentDbStr = currentResult.result;
+                    try {
+                        const existing = JSON.parse(currentDbStr);
+                        const existingDb = existing.db;
+                        existingHasData = existingDb && (
+                            (existingDb.banks && existingDb.banks.length > 0) ||
+                            (existingDb.socials && existingDb.socials.length > 0) ||
+                            (existingDb.qris && existingDb.qris.length > 0) ||
+                            (existingDb.backupContacts && existingDb.backupContacts.length > 0)
+                        );
+                    } catch (e) {
+                        console.error("Failed to parse existing DB for protection checks:", e);
+                    }
+                }
+            }
+
+            // 1. Data safety check: Reject empty overwrite if server already has data
+            if (incomingIsEmpty && existingHasData) {
+                return res.status(400).json({ 
+                    error: 'Penulisan ditolak: Data yang dikirim kosong sedangkan cloud database memiliki data aktif. Harap muat ulang halaman dashboard Anda untuk menyinkronkan data.' 
+                });
+            }
+
+            // 2. Rolling backup: Save current database to history list (max 10 entries) before overwriting
+            if (currentDbStr) {
+                try {
+                    // Push to history
+                    await fetch(KV_REST_API_URL, {
+                        method: 'POST',
+                        headers: { 
+                            Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(['LPUSH', 'api22_db_history', currentDbStr])
+                    });
+                    // Trim history to keep last 10 backups (0 to 9)
+                    await fetch(KV_REST_API_URL, {
+                        method: 'POST',
+                        headers: { 
+                            Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(['LTRIM', 'api22_db_history', 0, 9])
+                    });
+                } catch (backupError) {
+                    console.error("Failed to save rolling backup in KV:", backupError);
+                    // Do not block the write if backup fails, but log it
+                }
+            }
+
+            // 3. Save new database state to KV
             const response = await fetch(KV_REST_API_URL, {
                 method: 'POST',
                 headers: { 

@@ -41,7 +41,40 @@ app.get('/api/db', checkToken, (req, res) => {
 // Save database
 app.post('/api/db', checkToken, (req, res) => {
     try {
-        fs.writeFileSync(DB_FILE, JSON.stringify(req.body, null, 2), 'utf8');
+        const payload = req.body;
+        
+        // Check if incoming database payload is empty
+        const incomingDb = payload.db;
+        const incomingIsEmpty = !incomingDb || (
+            (!incomingDb.banks || incomingDb.banks.length === 0) &&
+            (!incomingDb.socials || incomingDb.socials.length === 0) &&
+            (!incomingDb.qris || incomingDb.qris.length === 0) &&
+            (!incomingDb.backupContacts || incomingDb.backupContacts.length === 0)
+        );
+
+        if (incomingIsEmpty && fs.existsSync(DB_FILE)) {
+            try {
+                const fileData = fs.readFileSync(DB_FILE, 'utf8');
+                const existing = JSON.parse(fileData);
+                const existingDb = existing.db;
+                const existingHasData = existingDb && (
+                    (existingDb.banks && existingDb.banks.length > 0) ||
+                    (existingDb.socials && existingDb.socials.length > 0) ||
+                    (existingDb.qris && existingDb.qris.length > 0) ||
+                    (existingDb.backupContacts && existingDb.backupContacts.length > 0)
+                );
+                
+                if (existingHasData) {
+                    return res.status(400).json({ 
+                        error: 'Penulisan ditolak: Data yang dikirim kosong sedangkan server memiliki data aktif. Harap muat ulang halaman dashboard Anda untuk menyinkronkan data.' 
+                    });
+                }
+            } catch (parseErr) {
+                console.error("Failed to parse local JSON for protection check:", parseErr);
+            }
+        }
+
+        fs.writeFileSync(DB_FILE, JSON.stringify(payload, null, 2), 'utf8');
         res.json({ success: true });
     } catch (e) {
         res.status(500).json({ error: 'Failed to write database file' });

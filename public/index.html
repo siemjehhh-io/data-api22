@@ -26,29 +26,12 @@
                 <div class="form-group">
                     <input type="password" id="masterPasswordInput" class="form-control" placeholder="Masukkan Master Password..." required style="text-align: center;">
                 </div>
-                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+                <button type="submit" id="authSubmitBtn" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
                     <span id="authBtnText">Simpan & Masuk</span>
                 </button>
             </form>
             <div id="authError" style="color: var(--accent-red); margin-top: 15px; font-size: 0.9rem; display: none;">
                 Kata sandi salah! Coba lagi.
-            </div>
-            
-            <!-- Google Sheets URL Setup (Displayed on Vercel or when chosen) -->
-            <div id="gasConfigContainer" style="display: none; border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 15px; text-align: left;">
-                <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 600;">Koneksi Google Sheets (Vercel Mode)</label>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4;">
-                    Masukkan URL Web App dari Google Apps Script untuk menghubungkan dashboard ke Google Sheets Anda.
-                </p>
-                <input type="text" id="setupGasUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec" style="font-size: 0.8rem; padding: 10px; margin-bottom: 8px;">
-                <button type="button" class="btn-secondary" id="btnTestSetupGasUrl" onclick="testSetupGasUrl()" style="width: 100%; justify-content: center; font-size: 0.8rem; padding: 10px; margin: 0; display: flex; align-items: center; gap: 6px;">
-                    Hubungkan ke Sheets
-                </button>
-                <div style="margin-top: 12px; text-align: center;">
-                    <a href="#" onclick="resetToLocalMode(); return false;" style="font-size: 0.8rem; color: var(--accent-active); text-decoration: none; font-weight: 600; display: inline-block;">
-                        &larr; Gunakan Database Vercel KV (Default)
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -132,7 +115,7 @@
                             <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                                    Daftar Link & Domain Aktif
+                                    Daftar Link & Domain
                                 </div>
                                 <button class="btn-primary" onclick="openManageDomainsModal()" style="font-size: 0.8rem; padding: 8px 16px; border-radius: var(--radius-sm); margin: 0; box-shadow: none; display: flex; align-items: center; gap: 6px;">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
@@ -282,41 +265,20 @@
                     </div>
 
                     <div class="card">
-                        <div class="card-title">Koneksi Google Sheets</div>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem; line-height: 1.5;">
-                            Hubungkan dashboard Anda ke database Google Sheets Anda menggunakan URL Google Apps Script Web App.
-                        </p>
-                        <div class="form-group">
-                            <label>Mode Database</label>
-                            <select id="dbModeSelect" class="form-control" onchange="toggleDbModeSettings()">
-                                <option value="local">Server API Lokal (db.json)</option>
-                                <option value="sheets">Google Sheets (via Google Script)</option>
-                            </select>
-                        </div>
-                        <div id="gasSettingsFields" style="display: none; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                            <div class="form-group">
-                                <label>URL Web App Google Script</label>
-                                <input type="text" id="gasWebAppUrlInput" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
-                            </div>
-                            <button type="button" class="btn-secondary" id="btnSaveGasSettings" onclick="saveGasSettings()" style="width: 100%; justify-content: center; margin-top: 10px;">
-                                Simpan & Hubungkan
-                            </button>
-                        </div>
-                        <div id="gasConnectionStatus" style="margin-top: 10px; font-size: 0.85rem; display: none;"></div>
-                    </div>
-
-                    <div class="card">
                         <div class="card-title">Ekspor / Impor Data</div>
                         <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5;">
-                            Anda bisa mencadangkan data penting API22 ini dalam bentuk file terenkripsi. File ini hanya bisa dibuka dengan Master Password saat ini.
+                            Anda bisa mencadangkan data penting API22 ini dalam bentuk file terenkripsi (JSON) atau mengekspor seluruh data dalam bentuk tabel spreadsheet (CSV) yang bisa dibaca di Excel.
                         </p>
-                        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                            <button class="btn-primary" onclick="exportData()" style="flex: 1; justify-content: center;">
+                        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                            <button class="btn-primary" onclick="exportData()" style="flex: 1; min-width: 180px; justify-content: center;">
                                 Ekspor JSON Terenkripsi
+                            </button>
+                            <button class="btn-secondary" onclick="exportToCSV()" style="flex: 1; min-width: 180px; justify-content: center; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--accent-active); color: var(--accent-active);">
+                                Ekspor Data ke CSV (Excel)
                             </button>
                         </div>
                         <div style="border-top: 1px solid var(--border-color); padding-top: 20px;">
-                            <label style="display: block; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px; font-weight: 500;">Impor File Cadangan</label>
+                            <label style="display: block; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px; font-weight: 500;">Impor File Cadangan (JSON)</label>
                             <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
                             <button class="btn-secondary" onclick="document.getElementById('importFile').click()" style="width: 100%; justify-content: center;">
                                 Pilih File JSON & Impor
@@ -607,7 +569,7 @@
     <div id="modalManageDomains" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h3>Kelola Link & Domain Aktif</h3>
+                <h3>Kelola Link & Domain</h3>
                 <button class="close-modal" onclick="closeModal('modalManageDomains')">&times;</button>
             </div>
             <form onsubmit="saveDomains(event)">
@@ -618,6 +580,10 @@
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label>Domain RTP Aktif</label>
                     <input type="text" id="inDomainRtp" class="form-control" placeholder="Contoh: https://rtpapi22.xyz">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Link Panel</label>
+                    <input type="text" id="inDomainPanel" class="form-control" placeholder="Contoh: https://api22-panel.xyz">
                 </div>
                 
                 <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; margin-bottom: 25px;">

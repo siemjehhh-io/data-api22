@@ -2,6 +2,7 @@
 const API_TOKEN = "api22_sec_e2c8a7b9d4f6c8e3";
 let masterKey = "";
 let currentBankFilter = "dp";
+let serverSyncStatus = "loading"; // 'loading', 'success', 'empty', 'error'
 let db = {
     mainContacts: {
         phone: { value: "", note: "" },
@@ -17,6 +18,7 @@ let db = {
     domains: {
         utama: "",
         rtp: "",
+        panel: "",
         alternatif: []
     }
 };
@@ -26,7 +28,7 @@ let db = {
 // ============================================================
 
 function getDbMode() {
-    return localStorage.getItem('api22_db_mode') || 'local';
+    return 'local';
 }
 
 function callSheetsAPI(action, data, successCallback, failureCallback) {
@@ -227,26 +229,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('api22_db_mode', 'local');
     }
     
-    const dbMode = getDbMode();
-    const gasUrl = localStorage.getItem('api22_gas_url');
+    // Show connecting status
+    checkPasswordStatus();
     
-    // Setup UI for Settings
-    const modeSelect = document.getElementById('dbModeSelect');
-    if (modeSelect) {
-        modeSelect.value = dbMode;
-        toggleDbModeSettings();
-    }
-    
-    if (dbMode === 'sheets') {
-        if (!gasUrl) {
-            // Show configuration setup on login screen
-            const setupDiv = document.getElementById('gasConfigContainer');
-            if (setupDiv) setupDiv.style.display = 'block';
-        }
-    } else {
-        // Only sync from Express API if we are in local server mode
-        await syncFromServer();
-    }
+    // Always sync from Server API in local/KV mode
+    await syncFromServer();
     
     checkPasswordStatus();
     
@@ -270,15 +257,40 @@ function checkPasswordStatus() {
     const authTitle = document.getElementById('authTitle');
     const authDesc = document.getElementById('authDesc');
     const authBtnText = document.getElementById('authBtnText');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    
+    if (serverSyncStatus === 'loading') {
+        authTitle.innerText = "Menghubungkan...";
+        authDesc.innerHTML = `<span style="color: var(--pastel-yellow-text); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="width: 16px; height: 16px; animation: spin 1s linear infinite;">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" style="opacity: 0.25;"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" style="opacity: 0.75;"></path>
+            </svg>
+            Menyinkronkan dengan database cloud...
+        </span>`;
+        authBtnText.innerText = "Harap Tunggu";
+        if (submitBtn) submitBtn.disabled = true;
+        return;
+    }
+    
+    if (serverSyncStatus === 'error') {
+        authTitle.innerText = "Sinkronisasi Gagal";
+        // Message is already updated in authDesc by syncFromServer()
+        authBtnText.innerText = "Gagal Terhubung";
+        if (submitBtn) submitBtn.disabled = true;
+        return;
+    }
     
     if (hash) {
         authTitle.innerText = "Masukkan Master Password";
         authDesc.innerText = "Gunakan kata sandi Anda untuk memecahkan enkripsi dan membuka data API22.";
         authBtnText.innerText = "Buka Dashboard";
+        if (submitBtn) submitBtn.disabled = false;
     } else {
         authTitle.innerText = "Set Master Password Baru";
         authDesc.innerText = "Tentukan kata sandi utama untuk mengamankan data secara lokal di browser Anda.";
         authBtnText.innerText = "Simpan & Masuk";
+        if (submitBtn) submitBtn.disabled = false;
     }
 }
 
@@ -441,6 +453,7 @@ function saveDatabaseToStorage() {
             domains: {
                 utama: encrypt(db.domains?.utama || ""),
                 rtp: encrypt(db.domains?.rtp || ""),
+                panel: encrypt(db.domains?.panel || ""),
                 alternatif: (db.domains?.alternatif || []).map(url => encrypt(url))
             }
         };
@@ -458,7 +471,21 @@ function saveDatabaseToStorage() {
                 'X-API22-Token': API_TOKEN
             },
             body: JSON.stringify(payload)
-        }).catch(err => console.error("Failed to sync to server database:", err));
+        })
+        .then(async (response) => {
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                const errMsg = errData.error || `HTTP error ${response.status}`;
+                console.error("Server sync failed:", errMsg);
+                showAlert("Gagal sinkronisasi ke Cloud: " + errMsg, "Sinkronisasi Gagal");
+            } else {
+                console.log("Server database synced successfully");
+            }
+        })
+        .catch(err => {
+            console.error("Failed to sync to server database:", err);
+            showToast("Cloud Offline: Perubahan disimpan di browser lokal.");
+        });
 
         return true;
     } catch (e) {
@@ -676,12 +703,14 @@ function loadDatabaseFromStorage() {
             db.domains = {
                 utama: decrypt(encryptedDb.domains.utama || ""),
                 rtp: decrypt(encryptedDb.domains.rtp || ""),
+                panel: decrypt(encryptedDb.domains.panel || ""),
                 alternatif: (encryptedDb.domains.alternatif || []).map(url => decrypt(url))
             };
         } else {
             db.domains = {
                 utama: "",
                 rtp: "",
+                panel: "",
                 alternatif: []
             };
         }
@@ -834,7 +863,7 @@ function renderContacts() {
 
 function initDomainsAfterLoad() {
     // Migrasi atau load fallback dari localStorage jika db.domains kosong
-    if (!db.domains || (!db.domains.utama && !db.domains.rtp && (!db.domains.alternatif || db.domains.alternatif.length === 0))) {
+    if (!db.domains || (!db.domains.utama && !db.domains.rtp && !db.domains.panel && (!db.domains.alternatif || db.domains.alternatif.length === 0))) {
         const localDomainsEncrypted = localStorage.getItem('api22_local_domains_encrypted');
         if (localDomainsEncrypted) {
             try {
@@ -845,6 +874,7 @@ function initDomainsAfterLoad() {
                         db.domains = {
                             utama: parsed.utama || "",
                             rtp: parsed.rtp || "",
+                            panel: parsed.panel || "",
                             alternatif: parsed.alternatif || []
                         };
                     }
@@ -855,7 +885,7 @@ function initDomainsAfterLoad() {
         }
     }
     if (!db.domains) {
-        db.domains = { utama: "", rtp: "", alternatif: [] };
+        db.domains = { utama: "", rtp: "", panel: "", alternatif: [] };
     }
     if (!db.domains.alternatif) {
         db.domains.alternatif = [];
@@ -870,12 +900,14 @@ function renderDomains() {
     
     const utama = db.domains.utama || "";
     const rtp = db.domains.rtp || "";
+    const panel = db.domains.panel || "";
     const alternatif = db.domains.alternatif || [];
     
     // Update stats count
     let totalDomainsCount = 0;
     if (utama) totalDomainsCount++;
     if (rtp) totalDomainsCount++;
+    if (panel) totalDomainsCount++;
     totalDomainsCount += alternatif.length;
     
     const statDomainsElem = document.getElementById('statDomains');
@@ -893,7 +925,23 @@ function renderDomains() {
         borderLeftColor: 'var(--accent-active)'
     });
     
-    // 2. Domain Alternatif
+    // 2. Domain RTP
+    rows.push({
+        label: 'Domain RTP',
+        value: rtp,
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-yellow-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
+        borderLeftColor: 'var(--pastel-yellow)'
+    });
+
+    // 3. Link Panel
+    rows.push({
+        label: 'Link Panel',
+        value: panel,
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: #ff0844;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`,
+        borderLeftColor: '#ff0844'
+    });
+    
+    // 4. Domain Alternatif
     if (alternatif.length > 0) {
         alternatif.forEach((url, index) => {
             rows.push({
@@ -911,14 +959,6 @@ function renderDomains() {
             borderLeftColor: 'var(--pastel-blue)'
         });
     }
-    
-    // 3. Domain RTP Aktif
-    rows.push({
-        label: 'Domain RTP Aktif',
-        value: rtp,
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-yellow-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
-        borderLeftColor: 'var(--pastel-yellow)'
-    });
     
     rows.forEach(r => {
         const row = document.createElement('div');
@@ -960,6 +1000,7 @@ function renderDomains() {
 function openManageDomainsModal() {
     document.getElementById('inDomainUtama').value = db.domains?.utama || '';
     document.getElementById('inDomainRtp').value = db.domains?.rtp || '';
+    document.getElementById('inDomainPanel').value = db.domains?.panel || '';
     
     const container = document.getElementById('formAltDomainsContainer');
     container.innerHTML = '';
@@ -1003,6 +1044,7 @@ function saveDomains(event) {
     
     const utama = document.getElementById('inDomainUtama').value.trim();
     const rtp = document.getElementById('inDomainRtp').value.trim();
+    const panel = document.getElementById('inDomainPanel').value.trim();
     
     const inputs = document.querySelectorAll('.alt-domain-input');
     const alternatif = [];
@@ -1016,6 +1058,7 @@ function saveDomains(event) {
     const domainsData = {
         utama: utama,
         rtp: rtp,
+        panel: panel,
         alternatif: alternatif
     };
     
@@ -2137,6 +2180,181 @@ function exportData() {
     downloadAnchor.remove();
 }
 
+function exportToCSV() {
+    if (!masterKey) {
+        showAlert('Silakan masuk terlebih dahulu untuk melakukan ekspor data.', 'Peringatan');
+        return;
+    }
+
+    try {
+        const csvRows = [];
+        
+        // CSV Headers
+        const headers = ['Kategori', 'Nama/Kunci', 'ID Rekening / Username / Nomor', 'Nama Akun / Platform / Jenis', 'Password / PIN / Nilai', 'Catatan'];
+        
+        const escapeCSVValue = (val) => {
+            if (val === null || val === undefined) return '';
+            let str = String(val);
+            // Escape double quotes by doubling them
+            str = str.replace(/"/g, '""');
+            // If contains commas, newlines, or double quotes, wrap in double quotes
+            if (str.includes(',') || str.includes('\n') || str.includes('\r') || str.includes('"')) {
+                str = `"${str}"`;
+            }
+            return str;
+        };
+        
+        csvRows.push(headers.map(escapeCSVValue).join(','));
+
+        // 1. Main Contacts
+        if (db.mainContacts) {
+            const mc = db.mainContacts;
+            const contacts = [
+                { key: 'Telepon', data: mc.phone },
+                { key: 'WhatsApp', data: mc.wa },
+                { key: 'Telegram', data: mc.tg },
+                { key: 'Telegram Nomor', data: mc.tgPhone }
+            ];
+            contacts.forEach(c => {
+                if (c.data && c.data.value) {
+                    csvRows.push([
+                        'Kontak Utama',
+                        c.key,
+                        c.data.value,
+                        '',
+                        '',
+                        c.data.note || ''
+                    ].map(escapeCSVValue).join(','));
+                }
+            });
+        }
+
+        // 2. Backup Contacts
+        if (db.backupContacts && db.backupContacts.length > 0) {
+            db.backupContacts.forEach(c => {
+                csvRows.push([
+                    'Kontak Cadangan',
+                    c.name || '',
+                    c.value || '',
+                    c.type || '',
+                    '',
+                    c.note || ''
+                ].map(escapeCSVValue).join(','));
+            });
+        }
+
+        // 3. Banks
+        if (db.banks && db.banks.length > 0) {
+            db.banks.forEach(bank => {
+                const categoryLabel = bank.category === 'wd' ? 'BANK WD' : 'BANK DP';
+                // Push main bank info
+                csvRows.push([
+                    categoryLabel,
+                    bank.name || '',
+                    bank.accountNo || '',
+                    bank.accountName || '',
+                    '',
+                    bank.note || ''
+                ].map(escapeCSVValue).join(','));
+                
+                // Push bank accesses
+                if (bank.accesses && bank.accesses.length > 0) {
+                    bank.accesses.forEach((acc, i) => {
+                        csvRows.push([
+                            `${categoryLabel} (Akses ${i + 1})`,
+                            bank.name || '',
+                            acc.user || '',
+                            acc.type || '',
+                            (acc.password || '') + (acc.pin ? ` / PIN: ${acc.pin}` : ''),
+                            acc.note || ''
+                        ].map(escapeCSVValue).join(','));
+                    });
+                }
+            });
+        }
+
+        // 4. Socials
+        if (db.socials && db.socials.length > 0) {
+            db.socials.forEach(soc => {
+                csvRows.push([
+                    'Sosial Media & Live Chat',
+                    soc.platform || '',
+                    soc.user || '',
+                    soc.url || '',
+                    soc.password || '',
+                    soc.note || ''
+                ].map(escapeCSVValue).join(','));
+            });
+        }
+
+        // 5. QRIS
+        if (db.qris && db.qris.length > 0) {
+            db.qris.forEach(q => {
+                csvRows.push([
+                    'QRIS / Akses Merchant',
+                    q.name || '',
+                    q.user || '',
+                    q.url || '',
+                    q.password || '',
+                    q.note || ''
+                ].map(escapeCSVValue).join(','));
+            });
+        }
+
+        // 6. Pulsa
+        if (db.pulsa && db.pulsa.length > 0) {
+            db.pulsa.forEach(p => {
+                csvRows.push([
+                    'Pulsa / Simcard',
+                    p.name || '',
+                    p.phone || '',
+                    `Masa Aktif: ${p.activePeriod || ''}`,
+                    `Saldo: ${p.balance || ''} (Selisih: ${p.difference || ''})`,
+                    p.note || ''
+                ].map(escapeCSVValue).join(','));
+            });
+        }
+
+        // 7. Domains
+        if (db.domains) {
+            const doms = db.domains;
+            if (doms.utama) {
+                csvRows.push(['Link & Domain', 'Domain Utama', doms.utama, '', '', ''].map(escapeCSVValue).join(','));
+            }
+            if (doms.rtp) {
+                csvRows.push(['Link & Domain', 'Domain RTP', doms.rtp, '', '', ''].map(escapeCSVValue).join(','));
+            }
+            if (doms.panel) {
+                csvRows.push(['Link & Domain', 'Link Panel', doms.panel, '', '', ''].map(escapeCSVValue).join(','));
+            }
+            if (doms.alternatif && doms.alternatif.length > 0) {
+                doms.alternatif.forEach((url, i) => {
+                    csvRows.push(['Link & Domain', `Domain Alternatif ${i + 1}`, url, '', '', ''].map(escapeCSVValue).join(','));
+                });
+            }
+        }
+
+        // Generate CSV and add UTF-8 BOM
+        const csvContent = "\ufeff" + csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        
+        const timestamp = new Date().toISOString().split('T')[0];
+        link.setAttribute("href", url);
+        link.setAttribute("download", `API22_Database_CSV_Backup_${timestamp}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showToast('Data berhasil diekspor ke CSV!');
+    } catch (err) {
+        console.error("CSV Export Error:", err);
+        showAlert("Gagal mengekspor data ke CSV: " + err.message, "Error Ekspor");
+    }
+}
+
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -2638,11 +2856,15 @@ function formatDisplayDate(dStr) {
 }
 
 async function syncFromServer() {
+    serverSyncStatus = 'loading';
     try {
         const response = await fetch('/api/db', {
             headers: { 'X-API22-Token': API_TOKEN }
         });
-        if (!response.ok) throw new Error('API request failed');
+        if (!response.ok) {
+            const errJson = await response.json().catch(() => ({}));
+            throw new Error(errJson.error || `HTTP error ${response.status}`);
+        }
         const data = await response.json();
         if (data && !data.empty) {
             if (data.hash) {
@@ -2651,8 +2873,20 @@ async function syncFromServer() {
             if (data.db) {
                 localStorage.setItem('api22_secure_db', JSON.stringify(data.db));
             }
+            serverSyncStatus = 'success';
+        } else {
+            serverSyncStatus = 'empty';
         }
     } catch (err) {
-        console.error("Failed to sync from server API, using local storage cache:", err);
+        console.error("Failed to sync from server API:", err);
+        serverSyncStatus = 'error';
+        
+        const authDesc = document.getElementById('authDesc');
+        if (authDesc) {
+            authDesc.innerHTML = `<span style="color: var(--accent-red); display: block; margin-top: 8px;">
+                ❌ Gagal sinkronisasi data cloud. Hubungkan Vercel KV atau muat ulang halaman.
+                <br><small style="font-size: 11px; opacity: 0.85;">Detail: ${escapeHTML(err.message)}</small>
+            </span>`;
+        }
     }
 }
