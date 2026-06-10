@@ -16,10 +16,11 @@ let db = {
     qris: [],
     pulsa: [],
     domains: {
-        utama: "",
-        rtp: "",
-        panel: "",
-        alternatif: []
+        list: [
+            { id: 'utama', type: 'utama', label: 'Domain Utama', value: '' },
+            { id: 'rtp', type: 'rtp', label: 'Domain RTP', value: '' },
+            { id: 'panel', type: 'panel', label: 'Link Panel', value: '' }
+        ]
     }
 };
 
@@ -451,10 +452,11 @@ function saveDatabaseToStorage() {
                 note: encrypt(p.note || "")
             })),
             domains: {
-                utama: encrypt(db.domains?.utama || ""),
-                rtp: encrypt(db.domains?.rtp || ""),
-                panel: encrypt(db.domains?.panel || ""),
-                alternatif: (db.domains?.alternatif || []).map(url => encrypt(url))
+                utama: encrypt((db.domains?.list || []).find(item => item.type === 'utama')?.value || ""),
+                rtp: encrypt((db.domains?.list || []).find(item => item.type === 'rtp')?.value || ""),
+                panel: encrypt((db.domains?.list || []).find(item => item.type === 'panel')?.value || ""),
+                alternatif: (db.domains?.list || []).filter(item => item.type === 'alt').map(item => encrypt(item.value || "")),
+                order: (db.domains?.list || []).map(item => ({ id: item.id, type: item.type }))
             }
         };
         localStorage.setItem('api22_secure_db', JSON.stringify(encryptedDb));
@@ -700,18 +702,59 @@ function loadDatabaseFromStorage() {
 
         // Decrypt domains
         if (encryptedDb.domains) {
-            db.domains = {
-                utama: decrypt(encryptedDb.domains.utama || ""),
-                rtp: decrypt(encryptedDb.domains.rtp || ""),
-                panel: decrypt(encryptedDb.domains.panel || ""),
-                alternatif: (encryptedDb.domains.alternatif || []).map(url => decrypt(url))
-            };
+            const utamaVal = decrypt(encryptedDb.domains.utama || "");
+            const rtpVal = decrypt(encryptedDb.domains.rtp || "");
+            const panelVal = decrypt(encryptedDb.domains.panel || "");
+            const alternatifVals = (encryptedDb.domains.alternatif || []).map(url => decrypt(url));
+            
+            const savedOrder = encryptedDb.domains.order || [];
+            const list = [];
+            
+            let addedUtama = false;
+            let addedRtp = false;
+            let addedPanel = false;
+            let altIndex = 0;
+            
+            savedOrder.forEach(o => {
+                if (o.type === 'utama' && !addedUtama) {
+                    list.push({ id: o.id || 'utama', type: 'utama', label: 'Domain Utama', value: utamaVal });
+                    addedUtama = true;
+                } else if (o.type === 'rtp' && !addedRtp) {
+                    list.push({ id: o.id || 'rtp', type: 'rtp', label: 'Domain RTP', value: rtpVal });
+                    addedRtp = true;
+                } else if (o.type === 'panel' && !addedPanel) {
+                    list.push({ id: o.id || 'panel', type: 'panel', label: 'Link Panel', value: panelVal });
+                    addedPanel = true;
+                } else if (o.type === 'alt') {
+                    if (altIndex < alternatifVals.length) {
+                        list.push({ id: o.id || `alt_${altIndex}`, type: 'alt', label: 'Domain Alternatif', value: alternatifVals[altIndex] });
+                        altIndex++;
+                    }
+                }
+            });
+            
+            if (!addedUtama) {
+                list.push({ id: 'utama', type: 'utama', label: 'Domain Utama', value: utamaVal });
+            }
+            if (!addedRtp) {
+                list.push({ id: 'rtp', type: 'rtp', label: 'Domain RTP', value: rtpVal });
+            }
+            if (!addedPanel) {
+                list.push({ id: 'panel', type: 'panel', label: 'Link Panel', value: panelVal });
+            }
+            while (altIndex < alternatifVals.length) {
+                list.push({ id: `alt_${altIndex}`, type: 'alt', label: 'Domain Alternatif', value: alternatifVals[altIndex] });
+                altIndex++;
+            }
+            
+            db.domains = { list: list };
         } else {
             db.domains = {
-                utama: "",
-                rtp: "",
-                panel: "",
-                alternatif: []
+                list: [
+                    { id: 'utama', type: 'utama', label: 'Domain Utama', value: '' },
+                    { id: 'rtp', type: 'rtp', label: 'Domain RTP', value: '' },
+                    { id: 'panel', type: 'panel', label: 'Link Panel', value: '' }
+                ]
             };
         }
         
@@ -862,21 +905,15 @@ function renderContacts() {
 // ============================================================
 
 function initDomainsAfterLoad() {
-    // Migrasi atau load fallback dari localStorage jika db.domains kosong
-    if (!db.domains || (!db.domains.utama && !db.domains.rtp && !db.domains.panel && (!db.domains.alternatif || db.domains.alternatif.length === 0))) {
+    if (!db.domains || !db.domains.list || db.domains.list.length === 0) {
         const localDomainsEncrypted = localStorage.getItem('api22_local_domains_encrypted');
         if (localDomainsEncrypted) {
             try {
                 const decryptedStr = decrypt(localDomainsEncrypted);
                 if (decryptedStr) {
                     const parsed = JSON.parse(decryptedStr);
-                    if (parsed && typeof parsed === 'object') {
-                        db.domains = {
-                            utama: parsed.utama || "",
-                            rtp: parsed.rtp || "",
-                            panel: parsed.panel || "",
-                            alternatif: parsed.alternatif || []
-                        };
+                    if (parsed && parsed.list) {
+                        db.domains = parsed;
                     }
                 }
             } catch (e) {
@@ -884,11 +921,30 @@ function initDomainsAfterLoad() {
             }
         }
     }
-    if (!db.domains) {
-        db.domains = { utama: "", rtp: "", panel: "", alternatif: [] };
+    
+    if (!db.domains || !db.domains.list) {
+        db.domains = {
+            list: [
+                { id: 'utama', type: 'utama', label: 'Domain Utama', value: '' },
+                { id: 'rtp', type: 'rtp', label: 'Domain RTP', value: '' },
+                { id: 'panel', type: 'panel', label: 'Link Panel', value: '' }
+            ]
+        };
     }
-    if (!db.domains.alternatif) {
-        db.domains.alternatif = [];
+    
+    const list = db.domains.list;
+    const hasUtama = list.some(item => item.type === 'utama');
+    const hasRtp = list.some(item => item.type === 'rtp');
+    const hasPanel = list.some(item => item.type === 'panel');
+    
+    if (!hasUtama) list.unshift({ id: 'utama', type: 'utama', label: 'Domain Utama', value: '' });
+    if (!hasRtp) {
+        const utIdx = list.findIndex(item => item.type === 'utama');
+        list.splice(utIdx + 1, 0, { id: 'rtp', type: 'rtp', label: 'Domain RTP', value: '' });
+    }
+    if (!hasPanel) {
+        const rtpIdx = list.findIndex(item => item.type === 'rtp');
+        list.splice(rtpIdx + 1, 0, { id: 'panel', type: 'panel', label: 'Link Panel', value: '' });
     }
 }
 
@@ -898,17 +954,13 @@ function renderDomains() {
     
     container.innerHTML = '';
     
-    const utama = db.domains.utama || "";
-    const rtp = db.domains.rtp || "";
-    const panel = db.domains.panel || "";
-    const alternatif = db.domains.alternatif || [];
+    const list = db.domains.list || [];
     
     // Update stats count
     let totalDomainsCount = 0;
-    if (utama) totalDomainsCount++;
-    if (rtp) totalDomainsCount++;
-    if (panel) totalDomainsCount++;
-    totalDomainsCount += alternatif.length;
+    list.forEach(item => {
+        if (item.value) totalDomainsCount++;
+    });
     
     const statDomainsElem = document.getElementById('statDomains');
     if (statDomainsElem) {
@@ -916,54 +968,48 @@ function renderDomains() {
     }
     
     const rows = [];
-    
-    // 1. Domain Utama
-    rows.push({
-        label: 'Domain Utama',
-        value: utama,
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>`,
-        borderLeftColor: 'var(--accent-active)'
-    });
-    
-    // 2. Domain RTP
-    rows.push({
-        label: 'Domain RTP',
-        value: rtp,
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-yellow-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
-        borderLeftColor: 'var(--pastel-yellow)'
-    });
-
-    // 3. Link Panel
-    rows.push({
-        label: 'Link Panel',
-        value: panel,
-        icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: #ff0844;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`,
-        borderLeftColor: '#ff0844'
-    });
-    
-    // 4. Domain Alternatif
-    if (alternatif.length > 0) {
-        alternatif.forEach((url, index) => {
-            rows.push({
-                label: `Domain Alternatif ${alternatif.length > 1 ? (index + 1) : ''}`,
-                value: url,
-                icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>`,
-                borderLeftColor: 'var(--pastel-blue)'
-            });
-        });
-    } else {
+    list.forEach((item) => {
+        let label = item.label;
+        if (item.type === 'alt') {
+            const altItems = list.filter(x => x.type === 'alt');
+            if (altItems.length > 1) {
+                const idxInAlt = altItems.findIndex(x => x.id === item.id);
+                label = `Domain Alternatif ${idxInAlt + 1}`;
+            } else {
+                label = 'Domain Alternatif';
+            }
+        }
+        
+        let icon = '';
+        let borderLeftColor = '';
+        if (item.type === 'utama') {
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--accent-active);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>`;
+            borderLeftColor = 'var(--accent-active)';
+        } else if (item.type === 'rtp') {
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-yellow-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`;
+            borderLeftColor = 'var(--pastel-yellow)';
+        } else if (item.type === 'panel') {
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: #ff0844;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`;
+            borderLeftColor = '#ff0844';
+        } else {
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>`;
+            borderLeftColor = 'var(--pastel-blue)';
+        }
+        
         rows.push({
-            label: 'Domain Alternatif',
-            value: '',
-            icon: `<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; color: var(--pastel-blue-text);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>`,
-            borderLeftColor: 'var(--pastel-blue)'
+            id: item.id,
+            label: label,
+            value: item.value || '',
+            icon: icon,
+            borderLeftColor: borderLeftColor
         });
-    }
+    });
     
     rows.forEach(r => {
         const row = document.createElement('div');
         row.className = 'contact-row-highlighted';
         row.style.borderLeftColor = r.borderLeftColor;
+        row.setAttribute('data-id', r.id);
         
         const hasVal = !!r.value;
         const displayVal = hasVal ? r.value : 'Belum diisi';
@@ -981,39 +1027,119 @@ function renderDomains() {
         ` : '';
         
         row.innerHTML = `
-            <div style="display: flex; align-items: flex-start; gap: 12px; width: 100%;">
-                <div class="contact-icon-wrapper" style="background: rgba(0,0,0,0.03);">${r.icon}</div>
-                <div style="flex-grow: 1;">
-                    <div class="contact-label-new">${r.label}</div>
-                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
-                        <span class="contact-value-new ${hasVal ? 'filled' : 'empty'}" style="font-size: 0.95rem; word-break: break-all;">${escapeHTML(displayVal)}</span>
-                        ${copyButton}
-                        ${openButton}
+            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                <div class="domain-drag-handle" title="Tarik untuk mengurutkan" style="cursor: grab; display: flex; align-items: center; justify-content: center; width: 18px; height: 38px; color: var(--text-muted); opacity: 0.5;">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 12px; flex-grow: 1;">
+                    <div class="contact-icon-wrapper" style="background: rgba(0,0,0,0.03);">${r.icon}</div>
+                    <div style="flex-grow: 1;">
+                        <div class="contact-label-new">${r.label}</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                            <span class="contact-value-new ${hasVal ? 'filled' : 'empty'}" style="font-size: 0.95rem; word-break: break-all;">${escapeHTML(displayVal)}</span>
+                            ${copyButton}
+                            ${openButton}
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+        
+        const handle = row.querySelector('.domain-drag-handle');
+        if (handle) {
+            handle.addEventListener('mousedown', () => {
+                row.setAttribute('draggable', 'true');
+            });
+            handle.addEventListener('mouseup', () => {
+                row.setAttribute('draggable', 'false');
+            });
+            handle.addEventListener('mouseenter', () => { handle.style.opacity = '1'; handle.style.color = 'var(--accent-active)'; });
+            handle.addEventListener('mouseleave', () => { handle.style.opacity = '0.5'; handle.style.color = 'var(--text-muted)'; });
+        }
+        
+        row.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', r.id);
+            row.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        row.addEventListener('dragend', () => {
+            row.classList.remove('dragging');
+            row.setAttribute('draggable', 'false');
+            document.querySelectorAll('.contact-row-highlighted').forEach(c => {
+                c.classList.remove('drag-over');
+            });
+        });
+        
+        row.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        });
+        
+        row.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            if (!row.classList.contains('dragging')) {
+                row.classList.add('drag-over');
+            }
+        });
+        
+        row.addEventListener('dragleave', () => {
+            row.classList.remove('drag-over');
+        });
+        
+        row.addEventListener('drop', (e) => {
+            e.preventDefault();
+            row.classList.remove('drag-over');
+            const draggedId = e.dataTransfer.getData('text/plain');
+            if (draggedId === r.id) return;
+            
+            reorderDomains(draggedId, r.id);
+        });
+        
         container.appendChild(row);
     });
 }
 
+function reorderDomains(draggedId, targetId) {
+    const list = db.domains.list;
+    const draggedIdx = list.findIndex(item => item.id === draggedId);
+    const targetIdx = list.findIndex(item => item.id === targetId);
+    
+    if (draggedIdx !== -1 && targetIdx !== -1) {
+        const [draggedItem] = list.splice(draggedIdx, 1);
+        list.splice(targetIdx, 0, draggedItem);
+        
+        renderDomains();
+        saveDatabaseToStorage();
+        showToast('Urutan domain berhasil diatur!');
+    }
+}
+
 function openManageDomainsModal() {
+    const list = db.domains.list || [];
+    const utamaItem = list.find(item => item.type === 'utama');
+    const rtpItem = list.find(item => item.type === 'rtp');
+    const panelItem = list.find(item => item.type === 'panel');
+    const alternatifItems = list.filter(item => item.type === 'alt');
+    
     const inUtama = document.getElementById('inDomainUtama');
     const inRtp = document.getElementById('inDomainRtp');
     const inPanel = document.getElementById('inDomainPanel');
     
-    if (inUtama) inUtama.value = db.domains?.utama || '';
-    if (inRtp) inRtp.value = db.domains?.rtp || '';
-    if (inPanel) inPanel.value = db.domains?.panel || '';
+    if (inUtama) inUtama.value = utamaItem ? utamaItem.value : '';
+    if (inRtp) inRtp.value = rtpItem ? rtpItem.value : '';
+    if (inPanel) inPanel.value = panelItem ? panelItem.value : '';
     
     const container = document.getElementById('formAltDomainsContainer');
     if (container) {
         container.innerHTML = '';
-        const alternatif = db.domains?.alternatif || [];
-        if (alternatif.length === 0) {
+        if (alternatifItems.length === 0) {
             addAltDomainRow('');
         } else {
-            alternatif.forEach(url => addAltDomainRow(url));
+            alternatifItems.forEach(item => addAltDomainRow(item.value));
         }
     }
     
@@ -1051,30 +1177,52 @@ function saveDomains(event) {
     const inRtp = document.getElementById('inDomainRtp');
     const inPanel = document.getElementById('inDomainPanel');
     
-    const utama = inUtama ? inUtama.value.trim() : '';
-    const rtp = inRtp ? inRtp.value.trim() : '';
-    const panel = inPanel ? inPanel.value.trim() : '';
+    const utamaVal = inUtama ? inUtama.value.trim() : '';
+    const rtpVal = inRtp ? inRtp.value.trim() : '';
+    const panelVal = inPanel ? inPanel.value.trim() : '';
     
     const inputs = document.querySelectorAll('.alt-domain-input');
-    const alternatif = [];
+    const newAlts = [];
     inputs.forEach(input => {
         const val = input.value.trim();
         if (val) {
-            alternatif.push(val);
+            newAlts.push(val);
         }
     });
     
-    const domainsData = {
-        utama: utama,
-        rtp: rtp,
-        panel: panel,
-        alternatif: alternatif
-    };
+    const currentList = db.domains.list || [];
+    const updatedList = [];
     
-    db.domains = domainsData;
+    let altValIndex = 0;
     
-    // Save to local backup fallback
-    localStorage.setItem('api22_local_domains_encrypted', encrypt(JSON.stringify(domainsData)));
+    currentList.forEach(item => {
+        if (item.type === 'utama') {
+            updatedList.push({ ...item, value: utamaVal });
+        } else if (item.type === 'rtp') {
+            updatedList.push({ ...item, value: rtpVal });
+        } else if (item.type === 'panel') {
+            updatedList.push({ ...item, value: panelVal });
+        } else if (item.type === 'alt') {
+            if (altValIndex < newAlts.length) {
+                updatedList.push({ ...item, value: newAlts[altValIndex] });
+                altValIndex++;
+            }
+        }
+    });
+    
+    while (altValIndex < newAlts.length) {
+        updatedList.push({
+            id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            type: 'alt',
+            label: 'Domain Alternatif',
+            value: newAlts[altValIndex]
+        });
+        altValIndex++;
+    }
+    
+    db.domains = { list: updatedList };
+    
+    localStorage.setItem('api22_local_domains_encrypted', encrypt(JSON.stringify(db.domains)));
     
     showLoadingOverlay('Menyimpan data domain...');
     
@@ -1093,18 +1241,11 @@ function saveDomains(event) {
         showToast('Tersimpan di Lokal browser!');
     };
     
-    if (getDbMode() === 'sheets') {
-        callSheetsAPI('saveDomains', domainsData, onSaveSuccess, (err) => {
-            // Fallback success
-            onSaveSuccess();
-        });
+    const success = saveDatabaseToStorage();
+    if (success) {
+        onSaveSuccess();
     } else {
-        const success = saveDatabaseToStorage();
-        if (success) {
-            onSaveSuccess();
-        } else {
-            onSaveError(new Error("Gagal menyimpan ke penyimpanan lokal."));
-        }
+        onSaveError(new Error("Gagal menyimpan ke penyimpanan lokal."));
     }
 }
 
@@ -2325,22 +2466,12 @@ function exportToCSV() {
         }
 
         // 7. Domains
-        if (db.domains) {
-            const doms = db.domains;
-            if (doms.utama) {
-                csvRows.push(['Link & Domain', 'Domain Utama', doms.utama, '', '', ''].map(escapeCSVValue).join(','));
-            }
-            if (doms.rtp) {
-                csvRows.push(['Link & Domain', 'Domain RTP', doms.rtp, '', '', ''].map(escapeCSVValue).join(','));
-            }
-            if (doms.panel) {
-                csvRows.push(['Link & Domain', 'Link Panel', doms.panel, '', '', ''].map(escapeCSVValue).join(','));
-            }
-            if (doms.alternatif && doms.alternatif.length > 0) {
-                doms.alternatif.forEach((url, i) => {
-                    csvRows.push(['Link & Domain', `Domain Alternatif ${i + 1}`, url, '', '', ''].map(escapeCSVValue).join(','));
-                });
-            }
+        if (db.domains && db.domains.list) {
+            db.domains.list.forEach(item => {
+                if (item.value) {
+                    csvRows.push(['Link & Domain', item.label, item.value, '', '', ''].map(escapeCSVValue).join(','));
+                }
+            });
         }
 
         // Generate CSV and add UTF-8 BOM
