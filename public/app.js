@@ -998,18 +998,23 @@ function renderDomains() {
 }
 
 function openManageDomainsModal() {
-    document.getElementById('inDomainUtama').value = db.domains?.utama || '';
-    document.getElementById('inDomainRtp').value = db.domains?.rtp || '';
-    document.getElementById('inDomainPanel').value = db.domains?.panel || '';
+    const inUtama = document.getElementById('inDomainUtama');
+    const inRtp = document.getElementById('inDomainRtp');
+    const inPanel = document.getElementById('inDomainPanel');
+    
+    if (inUtama) inUtama.value = db.domains?.utama || '';
+    if (inRtp) inRtp.value = db.domains?.rtp || '';
+    if (inPanel) inPanel.value = db.domains?.panel || '';
     
     const container = document.getElementById('formAltDomainsContainer');
-    container.innerHTML = '';
-    
-    const alternatif = db.domains?.alternatif || [];
-    if (alternatif.length === 0) {
-        addAltDomainRow('');
-    } else {
-        alternatif.forEach(url => addAltDomainRow(url));
+    if (container) {
+        container.innerHTML = '';
+        const alternatif = db.domains?.alternatif || [];
+        if (alternatif.length === 0) {
+            addAltDomainRow('');
+        } else {
+            alternatif.forEach(url => addAltDomainRow(url));
+        }
     }
     
     openModal('modalManageDomains');
@@ -1042,9 +1047,13 @@ function removeAltDomainRow(rowId) {
 function saveDomains(event) {
     if (event) event.preventDefault();
     
-    const utama = document.getElementById('inDomainUtama').value.trim();
-    const rtp = document.getElementById('inDomainRtp').value.trim();
-    const panel = document.getElementById('inDomainPanel').value.trim();
+    const inUtama = document.getElementById('inDomainUtama');
+    const inRtp = document.getElementById('inDomainRtp');
+    const inPanel = document.getElementById('inDomainPanel');
+    
+    const utama = inUtama ? inUtama.value.trim() : '';
+    const rtp = inRtp ? inRtp.value.trim() : '';
+    const panel = inPanel ? inPanel.value.trim() : '';
     
     const inputs = document.querySelectorAll('.alt-domain-input');
     const alternatif = [];
