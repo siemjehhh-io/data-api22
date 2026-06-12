@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-workspace_dir = r"d:\DATA WEB PIN88"
+workspace_dir = os.path.dirname(os.path.abspath(__file__))
 index_path = os.path.join(workspace_dir, "google_apps_script_single_sheets", "Index.html")
 
 with open(index_path, "r", encoding="utf-8") as f:
