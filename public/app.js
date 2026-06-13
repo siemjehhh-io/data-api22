@@ -209,15 +209,15 @@ function testSetupGasUrl() {
 
 // Initial Checks
 window.addEventListener('DOMContentLoaded', async () => {
-    // Auto-migrate legacy PIN88 keys to new API22 keys
+    // Auto-migrate legacy API22 keys to new API22 keys
     const legacyKeys = [
         'password_hash', 'secure_db', 'db_mode', 'gas_url', 
         'local_domains_encrypted', 'active_domain', 'alternate_domains'
     ];
     legacyKeys.forEach(k => {
-        const pinValue = localStorage.getItem('pin88_' + k);
-        if (pinValue !== null && localStorage.getItem('api22_' + k) === null) {
-            localStorage.setItem('api22_' + k, pinValue);
+        const apiValue = localStorage.getItem('api22_' + k);
+        if (apiValue !== null && localStorage.getItem('api22_' + k) === null) {
+            localStorage.setItem('api22_' + k, apiValue);
         }
     });
 

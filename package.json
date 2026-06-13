@@ -1,7 +1,7 @@
 {
-  "name": "pin88-app",
+  "name": "api22-app",
   "version": "1.0.0",
-  "description": "Secure PIN88 Dashboard with VPS Database Sync",
+  "description": "Secure API22 Dashboard with VPS Database Sync",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
