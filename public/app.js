@@ -946,6 +946,11 @@ function initDomainsAfterLoad() {
         const rtpIdx = list.findIndex(item => item.type === 'rtp');
         list.splice(rtpIdx + 1, 0, { id: 'panel', type: 'panel', label: 'Link Panel', value: '' });
     }
+
+    const hasAlt = list.some(item => item.type === 'alt');
+    if (!hasAlt) {
+        list.push({ id: 'alt_default', type: 'alt', label: 'Domain Alternatif', value: '' });
+    }
 }
 
 function renderDomains() {
@@ -1176,80 +1181,85 @@ function removeAltDomainRow(rowId) {
 
 function saveDomains(event) {
     if (event) event.preventDefault();
-    
-    const inUtama = document.getElementById('inDomainUtama');
-    const inRtp = document.getElementById('inDomainRtp');
-    const inPanel = document.getElementById('inDomainPanel');
-    
-    const utamaVal = inUtama ? inUtama.value.trim() : '';
-    const rtpVal = inRtp ? inRtp.value.trim() : '';
-    const panelVal = inPanel ? inPanel.value.trim() : '';
-    
-    const inputs = document.querySelectorAll('.alt-domain-input');
-    const newAlts = [];
-    inputs.forEach(input => {
-        const val = input.value.trim();
-        if (val) {
-            newAlts.push(val);
-        }
-    });
-    
-    const currentList = db.domains.list || [];
-    const updatedList = [];
-    
-    let altValIndex = 0;
-    
-    currentList.forEach(item => {
-        if (item.type === 'utama') {
-            updatedList.push({ ...item, value: utamaVal });
-        } else if (item.type === 'rtp') {
-            updatedList.push({ ...item, value: rtpVal });
-        } else if (item.type === 'panel') {
-            updatedList.push({ ...item, value: panelVal });
-        } else if (item.type === 'alt') {
-            if (altValIndex < newAlts.length) {
-                updatedList.push({ ...item, value: newAlts[altValIndex] });
-                altValIndex++;
+    try {
+        const inUtama = document.getElementById('inDomainUtama');
+        const inRtp = document.getElementById('inDomainRtp');
+        const inPanel = document.getElementById('inDomainPanel');
+        
+        const utamaVal = inUtama ? inUtama.value.trim() : '';
+        const rtpVal = inRtp ? inRtp.value.trim() : '';
+        const panelVal = inPanel ? inPanel.value.trim() : '';
+        
+        const inputs = document.querySelectorAll('.alt-domain-input');
+        const newAlts = [];
+        inputs.forEach(input => {
+            const val = input.value.trim();
+            if (val) {
+                newAlts.push(val);
             }
-        }
-    });
-    
-    while (altValIndex < newAlts.length) {
-        updatedList.push({
-            id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-            type: 'alt',
-            label: 'Domain Alternatif',
-            value: newAlts[altValIndex]
         });
-        altValIndex++;
-    }
-    
-    db.domains = { list: updatedList };
-    
-    localStorage.setItem('api22_local_domains_encrypted', encrypt(JSON.stringify(db.domains)));
-    
-    showLoadingOverlay('Menyimpan data domain...');
-    
-    const onSaveSuccess = () => {
+        
+        const currentList = db.domains.list || [];
+        const updatedList = [];
+        
+        let altValIndex = 0;
+        
+        currentList.forEach(item => {
+            if (item.type === 'utama') {
+                updatedList.push({ ...item, value: utamaVal });
+            } else if (item.type === 'rtp') {
+                updatedList.push({ ...item, value: rtpVal });
+            } else if (item.type === 'panel') {
+                updatedList.push({ ...item, value: panelVal });
+            } else if (item.type === 'alt') {
+                if (altValIndex < newAlts.length) {
+                    updatedList.push({ ...item, value: newAlts[altValIndex] });
+                    altValIndex++;
+                }
+            }
+        });
+        
+        while (altValIndex < newAlts.length) {
+            updatedList.push({
+                id: 'alt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                type: 'alt',
+                label: 'Domain Alternatif',
+                value: newAlts[altValIndex]
+            });
+            altValIndex++;
+        }
+        
+        db.domains = { list: updatedList };
+        
+        localStorage.setItem('api22_local_domains_encrypted', encrypt(JSON.stringify(db.domains)));
+        
+        showLoadingOverlay('Menyimpan data domain...');
+        
+        const onSaveSuccess = () => {
+            hideLoadingOverlay();
+            closeModal('modalManageDomains');
+            renderApp();
+            showToast('Data Link & Domain berhasil disimpan!');
+        };
+        
+        const onSaveError = (err) => {
+            hideLoadingOverlay();
+            console.warn("Failed to sync domains with backend, fallback used:", err);
+            closeModal('modalManageDomains');
+            renderApp();
+            showToast('Tersimpan di Lokal browser!');
+        };
+        
+        const success = saveDatabaseToStorage();
+        if (success) {
+            onSaveSuccess();
+        } else {
+            onSaveError(new Error("Gagal menyimpan ke penyimpanan lokal."));
+        }
+    } catch (err) {
+        console.error("Error in saveDomains:", err);
         hideLoadingOverlay();
-        closeModal('modalManageDomains');
-        renderApp();
-        showToast('Data Link & Domain berhasil disimpan!');
-    };
-    
-    const onSaveError = (err) => {
-        hideLoadingOverlay();
-        console.warn("Failed to sync domains with backend, fallback used:", err);
-        closeModal('modalManageDomains');
-        renderApp();
-        showToast('Tersimpan di Lokal browser!');
-    };
-    
-    const success = saveDatabaseToStorage();
-    if (success) {
-        onSaveSuccess();
-    } else {
-        onSaveError(new Error("Gagal menyimpan ke penyimpanan lokal."));
+        showAlert("Gagal menyimpan domain: " + err.message, "Error");
     }
 }
 
@@ -1265,6 +1275,34 @@ function reorderBanks(draggedId, targetId) {
         renderBanks();
         saveDatabaseToStorage();
         showToast('Urutan kartu bank berhasil diatur!');
+    }
+}
+
+function reorderSocials(draggedId, targetId) {
+    const draggedIdx = db.socials.findIndex(soc => soc.id === draggedId);
+    const targetIdx = db.socials.findIndex(soc => soc.id === targetId);
+    
+    if (draggedIdx !== -1 && targetIdx !== -1) {
+        const [draggedSoc] = db.socials.splice(draggedIdx, 1);
+        db.socials.splice(targetIdx, 0, draggedSoc);
+        
+        renderSocials();
+        saveDatabaseToStorage();
+        showToast('Urutan akses sosmed berhasil diatur!');
+    }
+}
+
+function reorderQris(draggedId, targetId) {
+    const draggedIdx = db.qris.findIndex(q => q.id === draggedId);
+    const targetIdx = db.qris.findIndex(q => q.id === targetId);
+    
+    if (draggedIdx !== -1 && targetIdx !== -1) {
+        const [draggedQ] = db.qris.splice(draggedIdx, 1);
+        db.qris.splice(targetIdx, 0, draggedQ);
+        
+        renderQris();
+        saveDatabaseToStorage();
+        showToast('Urutan kredensial QRIS berhasil diatur!');
     }
 }
 
@@ -1656,9 +1694,27 @@ function renderSocials() {
     db.socials.forEach(soc => {
         const card = document.createElement('div');
         card.className = 'data-card social';
+        card.id = `social-card-${soc.id}`;
+        
+        const dragHandleHtml = `
+            <div class="social-drag-handle" title="Tarik untuk mengatur urutan" style="cursor: grab; display: flex; align-items: center; color: var(--text-secondary); opacity: 0.35; padding: 4px; transition: var(--transition); flex-shrink: 0;">
+                <svg width="12" height="18" viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="2.5" cy="3" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="3" r="1.5" fill="currentColor" />
+                    <circle cx="2.5" cy="9" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="9" r="1.5" fill="currentColor" />
+                    <circle cx="2.5" cy="15" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="15" r="1.5" fill="currentColor" />
+                </svg>
+            </div>
+        `;
+        
         card.innerHTML = `
-            <div class="data-card-header">
-                <div class="data-card-title">${escapeHTML(soc.platform)}</div>
+            <div class="data-card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    ${dragHandleHtml}
+                    <div class="data-card-title">${escapeHTML(soc.platform)}</div>
+                </div>
                 <div class="data-card-actions">
                     <button class="action-btn edit" onclick="editSocial('${soc.id}')" title="Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
@@ -1702,6 +1758,60 @@ function renderSocials() {
                 </div>
             ` : ''}
         `;
+        
+        // Attach drag-and-drop listeners
+        const handle = card.querySelector('.social-drag-handle');
+        if (handle) {
+            handle.addEventListener('mousedown', () => {
+                card.setAttribute('draggable', 'true');
+            });
+            handle.addEventListener('mouseup', () => {
+                card.setAttribute('draggable', 'false');
+            });
+            handle.addEventListener('mouseenter', () => { handle.style.opacity = '0.85'; handle.style.color = 'var(--text-primary)'; });
+            handle.addEventListener('mouseleave', () => { handle.style.opacity = '0.35'; handle.style.color = 'var(--text-secondary)'; });
+        }
+        
+        card.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', soc.id);
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            card.setAttribute('draggable', 'false');
+            document.querySelectorAll('.data-card.social').forEach(c => {
+                c.classList.remove('drag-over');
+            });
+        });
+        
+        card.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        });
+        
+        card.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            if (!card.classList.contains('dragging')) {
+                card.classList.add('drag-over');
+            }
+        });
+        
+        card.addEventListener('dragleave', () => {
+            card.classList.remove('drag-over');
+        });
+        
+        card.addEventListener('drop', (e) => {
+            e.preventDefault();
+            card.classList.remove('drag-over');
+            const draggedSocId = e.dataTransfer.getData('text/plain');
+            if (draggedSocId === soc.id) return;
+            
+            reorderSocials(draggedSocId, soc.id);
+        });
+        
         container.appendChild(card);
     });
 }
@@ -1717,10 +1827,28 @@ function renderQris() {
     
     db.qris.forEach(q => {
         const card = document.createElement('div');
-        card.className = 'data-card';
+        card.className = 'data-card qris';
+        card.id = `qris-card-${q.id}`;
+        
+        const dragHandleHtml = `
+            <div class="qris-drag-handle" title="Tarik untuk mengatur urutan" style="cursor: grab; display: flex; align-items: center; color: var(--text-secondary); opacity: 0.35; padding: 4px; transition: var(--transition); flex-shrink: 0;">
+                <svg width="12" height="18" viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="2.5" cy="3" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="3" r="1.5" fill="currentColor" />
+                    <circle cx="2.5" cy="9" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="9" r="1.5" fill="currentColor" />
+                    <circle cx="2.5" cy="15" r="1.5" fill="currentColor" />
+                    <circle cx="9.5" cy="15" r="1.5" fill="currentColor" />
+                </svg>
+            </div>
+        `;
+        
         card.innerHTML = `
-            <div class="data-card-header">
-                <div class="data-card-title">${escapeHTML(q.name)}</div>
+            <div class="data-card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    ${dragHandleHtml}
+                    <div class="data-card-title">${escapeHTML(q.name)}</div>
+                </div>
                 <div class="data-card-actions">
                     <button class="action-btn edit" onclick="editQris('${q.id}')" title="Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
@@ -1764,6 +1892,60 @@ function renderQris() {
                 </div>
             ` : ''}
         `;
+        
+        // Attach drag-and-drop listeners
+        const handle = card.querySelector('.qris-drag-handle');
+        if (handle) {
+            handle.addEventListener('mousedown', () => {
+                card.setAttribute('draggable', 'true');
+            });
+            handle.addEventListener('mouseup', () => {
+                card.setAttribute('draggable', 'false');
+            });
+            handle.addEventListener('mouseenter', () => { handle.style.opacity = '0.85'; handle.style.color = 'var(--text-primary)'; });
+            handle.addEventListener('mouseleave', () => { handle.style.opacity = '0.35'; handle.style.color = 'var(--text-secondary)'; });
+        }
+        
+        card.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', q.id);
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            card.setAttribute('draggable', 'false');
+            document.querySelectorAll('.data-card.qris').forEach(c => {
+                c.classList.remove('drag-over');
+            });
+        });
+        
+        card.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        });
+        
+        card.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            if (!card.classList.contains('dragging')) {
+                card.classList.add('drag-over');
+            }
+        });
+        
+        card.addEventListener('dragleave', () => {
+            card.classList.remove('drag-over');
+        });
+        
+        card.addEventListener('drop', (e) => {
+            e.preventDefault();
+            card.classList.remove('drag-over');
+            const draggedQrisId = e.dataTransfer.getData('text/plain');
+            if (draggedQrisId === q.id) return;
+            
+            reorderQris(draggedQrisId, q.id);
+        });
+        
         container.appendChild(card);
     });
 }
@@ -3032,5 +3214,36 @@ async function syncFromServer() {
                 <br><small style="font-size: 11px; opacity: 0.85;">Detail: ${escapeHTML(err.message)}</small>
             </span>`;
         }
+    }
+}
+
+// Loading Overlay implementation for Vercel/Local client
+function showLoadingOverlay(msg) {
+    let overlay = document.getElementById('loadingOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'loadingOverlay';
+        overlay.style = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.3s ease;';
+        overlay.innerHTML = `
+            <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid var(--border-color); border-top-color: var(--accent-active); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <div id="loadingOverlayMsg" style="margin-top: 15px; font-family: 'Outfit', 'Inter', sans-serif; font-weight: 600; color: var(--text-primary); font-size: 1rem;">${escapeHTML(msg)}</div>
+            <style>
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            </style>
+        `;
+        document.body.appendChild(overlay);
+    } else {
+        const msgElem = document.getElementById('loadingOverlayMsg');
+        if (msgElem) msgElem.innerText = msg;
+        overlay.style.display = 'flex';
+    }
+}
+
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
     }
 }

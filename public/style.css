@@ -506,13 +506,13 @@ header {
 .data-card.bank {
     transition: var(--transition), border-color 0.15s ease, opacity 0.15s ease;
 }
-.data-card.bank.dragging {
+.data-card.dragging {
     opacity: 0.45 !important;
     border: 2px dashed var(--accent-active) !important;
     box-shadow: none !important;
     transform: scale(0.98);
 }
-.data-card.bank.drag-over {
+.data-card.drag-over {
     border: 2px solid var(--accent-active) !important;
     transform: translateY(-4px) scale(1.02);
     box-shadow: var(--shadow-lg) !important;
